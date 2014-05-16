@@ -1,0 +1,29 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid">
+
+    <div class="box span12">
+        <div class="box-header well">
+            <h2><i class="icon-wrench"></i>{{ page_title }}</h2>
+        </div>
+        <div class="box-content">
+            <form class="form-horizontal" method="POST" accept-charset="."> {% csrf_token %}
+            {% for field in form.visible_fields %}
+                      {{ field.label }}
+                          {{ field }}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary btn-small">Get report</button>
+            </form>
+        </div>
+    </div>
+    {% if not nothing_selected %}
+    <div class="box span12">
+       <div id="chart_plot01">
+        </div>
+    </div>
+    {% endif %}
+</div> <!-- container -->
+
+{% include 'footer.html' %}

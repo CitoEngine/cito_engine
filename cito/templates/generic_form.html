@@ -1,0 +1,70 @@
+{% include 'header.html' %}
+
+
+{%  include 'top_nav_bar.html' %}
+
+        <div class="container-fluid">
+            {% include 'noscript.html' %}
+            <div id="content" class="span10">
+            <!-- content starts -->
+            <div class="row-fluid sortable">
+            {%  if not formSaved and not errors%}
+                <div class="box span12">
+                    <div class="box-header well">
+                        <h2><i class="icon-plus"></i>{{ box_title }}</h2>
+                    </div>
+
+                    <div class="box-content">
+                        <form class="form-horizontal" method="POST" accept-charset="."> {% csrf_token %}
+                            <legend></legend>
+                         {% for field in form.hidden_fields %}
+                                {{ field }}
+                          {% endfor %}
+
+                              {% for field in form.visible_fields %}
+                                {% if not field.errors %}
+                                <div class="control-group">
+                                  <label class="control-label" for="typeahead">{{ field.label_tag }}</label>
+                                  <div class="controls col-lg-4">
+                                      {{ field }}
+                                  </div>
+                                </div>
+                                {% else %}
+                               <div class="control-group error">
+								<label class="control-label" for="inputError">{{ field.label_tag }}</label>
+								<div class="controls">
+								  {{ field }}
+								  <span class="help-inline">{{ field.errors }}</span>
+								</div>
+							    </div>
+                                {% endif %}
+                              {% endfor %}
+                            <div>
+                                <button type="submit" class="btn btn-primary btn-small">Save Button</button>
+                                <button type="button" class="btn btn-small"  onclick="javascript:history.go(-1)">Cancel</button>
+                            </div>
+                        </form>
+
+                     </div>
+                </div>
+            {% elif formSaved %}
+                <div class="alert alert-success span12">
+                {{ responseText }}
+                </div>
+            </div>
+
+            </div><!--/.fluid-container-->
+        </div>
+            {% elif errors %}
+{#                <div class="btn-group span12">#}
+                    <div class="alert alert-error span12">
+                    <ul>
+                        {% for error in errors %}
+                               <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="javascript:history.go(-1)">Go Back</button>
+{#                </div>#}
+            {% endif %}
+{% include 'footer.html' %}

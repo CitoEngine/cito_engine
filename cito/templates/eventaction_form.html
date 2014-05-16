@@ -1,0 +1,89 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid">
+    <div class="box span12">
+        <div class="box-header well">
+            <h2><i class="icon-wrench"></i>{{ page_title }}</h2>
+        </div>
+        <div class="box-content">
+            <form class="form-horizontal" method="POST" accept-charset="."> {% csrf_token %}
+                <div class="control-group">
+                  <label class="control-label" for="typeahead">{{ form.plugin.label_tag }}</label>
+                  <div class="controls col-lg-4">
+                      {{ form.plugin }}<span class="help-inline">{{ form.plugin.errors }}</span>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="typeahead">Enabled</label>
+                  <div class="controls col-lg-4">
+                      {{ form.isEnabled }}
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="typeahead">{{ form.threshold_count.label_tag }}</label>
+                  <div class="controls col-lg-4">
+                      {{ form.threshold_count }} (secs)<span class="help-inline">{{ form.threshold_count.errors }}</span>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="typeahead">{{ form.threshold_timer.label_tag }}</label>
+                  <div class="controls col-lg-4">
+                      {{ form.threshold_timer }} (secs) <span class="help-inline">{{ form.threshold_timer.errors }}</span>
+                  </div>
+                </div>
+
+              {{ form.event }}
+{#              plugin params  #}
+              <div class="tabbable tabs-below">
+                    <div class="tab-content ">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#ui" data-toggle="tab" id="ui_tab">Plugin Params</a></li>
+                            <li><a href="#json_content" data-toggle="tab" id="json_tab">View JSON</a></li>
+                        </ul>
+
+                        <div class="tab-pane active" id="ui">
+                                <div class="col-md-8" style="padding-left:0px">
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <ul class="list-group col-md-offset-3 col-md-6" id="ui_options">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Options</div>
+                                    <div class="panel-body" id="options">
+                                        <p class="span3"><button type="button" class="btn btn-success btn-block option">__ELEMENT__</button></p>
+                                        <p class="span3"><button type="button" class="btn btn-success btn-block option">__MESSAGE__</button></p>
+                                        <p class="span3"><button type="button" class="btn btn-success btn-block option">__EVENTID__</button></p>
+                                        <p class="span3"><button type="button" class="btn btn-success btn-block option">__INCIDENTID__</button></p>
+                                        <p class="span3"><button type="button" class="btn btn-success btn-block add_new">Custom Param</button></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> {# ui #}
+
+                        <div class="tab-pane fade" id="json_content">
+                            <div class="panel panel-default">
+                                    <div class="panel-heading">Raw JSON</div>
+                                    <div class="panel-body" id="options">
+                                          <div class="controls col-lg-4">
+                                              {{ form.pluginParameters }}
+                                          </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div> {# tab-content #}
+              </div> {# tabbable #}
+{#              plugin params  #}
+
+            <button type="submit" class="btn btn-primary btn-small">Save</button>
+            </form>
+        </div>
+    </div>
+</div> <!-- container -->
+
+{% include 'footer.html' %}
