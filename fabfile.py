@@ -52,7 +52,7 @@ def mkdirs():
 
 def upload_reqs():
     print(yellow('Starting >> %s()' % _fn()))
-    put('../requirements.txt', env.app_dir)
+    put('requirements.txt', env.app_dir)
 
 
 def install_build_deps():
