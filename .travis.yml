@@ -6,5 +6,8 @@ python:
   - "3.3"
 # command to install dependencies
 install: "pip install -r requirements.txt"
+before_script: 
+    - mysql -e 'create database mysite_db;'
+    - python manage.py syncdb --noinput
 # command to run tests
 script: python manage.py test
