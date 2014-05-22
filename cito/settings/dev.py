@@ -110,31 +110,68 @@ DATABASES = {
     }
 }
 
-# AWS conf
+
+##################################
+# AWS::SQS Configuration settings
+##################################
 AWS_CONF = dict()
 AWS_CONF['region'] = 'us-east-1'
 AWS_CONF['awskey'] = ''
 AWS_CONF['awssecret'] = ''
 AWS_CONF['sqsqueue'] = 'citoq'
 
-#SQS Poller config
-SQSPOLLER_CONFIG = {
-    # Polling internval
-    'interval': 5,
-    # Number of messages to poll from SQS
-    'batchsize': 10,
-    # How long should the poller hold on the the message before someone else picks it up.
-    # Leave this to 60 seconds if you don't know what you are doing
-    'visibility': 60
-}
 
-DISPATCHER_CONFIG = {
-    # Polling internval
-    'interval': 10,
-    # Job lock expire time
-    'lock_expire': 30
-}
+##################################
+# RabbitMQ Configuration settings
+##################################
+RABBITMQ_CONF = dict()
+RABBITMQ_CONF['host'] = 'localhost'
+RABBITMQ_CONF['port'] = 5672
+RABBITMQ_CONF['username'] = 'cito_user'
+RABBITMQ_CONF['password'] = 'CHANGEME!'
+RABBITMQ_CONF['ssl'] = False
+RABBITMQ_CONF['exchange'] = ''
+RABBITMQ_CONF['vhost'] = '/cito_event_listener'
+RABBITMQ_CONF['queue'] = 'cito_commonq'
 
-EVENT_LISTENER_CONFIG = {
-    'port': 8080
-}
+
+##############################
+# Queue type: SQS or RABBITMQ
+##############################
+QUEUE_TYPE = 'RABBITMQ'
+
+
+##############################
+# Event Poller config
+##############################
+POLLER_CONFIG = dict()
+
+# Polling interval in seconds
+POLLER_CONFIG['interval'] = 5
+
+# Number of messages to poll from queue
+POLLER_CONFIG['batchsize'] = 10
+
+# How long should the poller hold on the the message before someone else picks it up on
+# Leave this to 60 seconds if you don't know what you are doing.
+POLLER_CONFIG['visibility'] = 60
+
+
+########################################
+# Dispatcher config
+# (will be deprecated in future release
+########################################
+DISPATCHER_CONFIG = dict()
+
+# Polling interval
+DISPATCHER_CONFIG['interval'] = 10
+
+# Job lock expire time
+DISPATCHER_CONFIG['lock_expire'] = 30
+
+
+##############################
+# Event Listener config
+##############################
+EVENT_LISTENER_CONFIG = dict()
+EVENT_LISTENER_CONFIG['port'] = 8080
