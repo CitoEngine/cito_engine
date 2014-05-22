@@ -15,14 +15,14 @@ limitations under the License.
 
 
 from django.core.management.base import BaseCommand
-from cito_engine.poller import sqspoller
+from cito_engine.poller import event_poller
 
 
 class Command(BaseCommand):
 
-    help = 'Start cito poller'
+    help = 'Start CitoEngine Event Poller'
 
     def handle(self, *args, **options):
-        s = sqspoller.SQSPoller()
-        s.begin_sqs_poller()
+        e = event_poller.EventPoller()
+        e.begin_event_poller()
 
