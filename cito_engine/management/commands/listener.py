@@ -14,12 +14,12 @@ limitations under the License.
 """
 
 from django.core.management.base import BaseCommand
-from event_listener.sqs import web_listener
+from event_listener import web_listener
 
 
 class Command(BaseCommand):
 
-    help = 'Start cito event lister'
+    help = 'Start CitoEngine Event Listener'
 
     def handle(self, *args, **options):
         web_listener.start_listener()
