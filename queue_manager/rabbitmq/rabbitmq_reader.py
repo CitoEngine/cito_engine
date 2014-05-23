@@ -56,10 +56,16 @@ class RabbitMQReader(object):
     def get_message(self):
         if not self.connection:
             self._connect_mq()
-        method_frame, header_frame, body = self.channel.basic_get(settings.RABBITMQ_CONF['queue'], no_ack=False)
+        try:
+            method_frame, header_frame, body = self.channel.basic_get(settings.RABBITMQ_CONF['queue'], no_ack=False)
+        except:
+            # Send an empty tuple if channel.basic_get failed for some reason.
+            return None, None
+
         if method_frame:
             return method_frame, body
         else:
+            # Send an empty tuple if channel.basic_get did not return a message
             return None, None
 
     def delete_message(self, method_frame):
