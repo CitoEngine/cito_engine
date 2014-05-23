@@ -25,7 +25,7 @@ from .event_actions import update_eventaction_counters
 
 
 
-class ProcessIncident():
+class ProcessIncident(object):
     def __init__(self, incident, message):
         self.incident = incident
         self.incident_message = message
