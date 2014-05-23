@@ -103,4 +103,4 @@ def refresh_pluginserver(request, pluginserver_id):
         return render_to_response('unauthorized.html', context_instance=RequestContext(request))
     plugin_server = get_object_or_404(PluginServer, pk=pluginserver_id)
     pluginpoller.pluginpoller(plugin_server)
-    return redirect('/pluginservers/view/%s' % pluginserver_id)
+    return redirect('/pluginservers/view/%s/' % pluginserver_id)
