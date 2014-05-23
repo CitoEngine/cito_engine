@@ -23,7 +23,7 @@ import requests
 import logging
 from cito_engine.models import Plugin, PluginServer
 
-logger = logging.getLogger('main')
+logger = logging.getLogger('poller_logger')
 
 
 def pluginpoller(server):
