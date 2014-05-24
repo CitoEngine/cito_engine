@@ -22,10 +22,10 @@ class TestDashboardViews(TestCase):
     def setUp(self):
         self.client = Client()
         for name in ['alpha', 'omega']:
-            factories.TeamFactory(name=name)
-        self.user = User.objects.create_user(username='hodor', password='hodor',
-                                             first_name='Hodor', last_name='HodorHodor',
-                                             email='hodor@hodor.hodor')
+            factories.TeamFactory.create(name=name)
+        self.user = User.objects.create_user(username='phil', password='phil',
+                                             first_name='phil', last_name='phil',
+                                             email='phil@planet.hodor')
 
     def test_dashboard_without_login(self):
         """
@@ -38,7 +38,7 @@ class TestDashboardViews(TestCase):
         """
         Testing if team dashboard has team names in it
         """
-        self.client.login(username='hodor', password='hodor')
+        self.client.login(username='phil', password='phil')
         response = self.client.get('/dashboard/')
         self.assertContains(response, 'alpha')
         self.assertContains(response, 'omega')
