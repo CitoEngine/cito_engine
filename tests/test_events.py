@@ -24,7 +24,7 @@ from . import factories
 
 class TeamTestCase(TestCase):
     def setUp(self):
-        self.team = factories.TeamFactory()
+        self.team = factories.TeamFactory.create()
 
     def test_team_name(self):
         self.assertEquals(self.team.name, 'The_A_Team')
@@ -32,7 +32,7 @@ class TeamTestCase(TestCase):
 
 class EventTestCase(TestCase):
     def setUp(self, *args, **kwargs):
-        self.team = factories.TeamFactory(name='TheATeam',description='The awesome A-TestTeam')
+        self.team = factories.TeamFactory.create(name='TheATeam',description='The awesome A-TestTeam')
         self.category = factories.CategoryFactory(categoryType='TestCategoryType')
         self.event = factories.EventFactory(summary='TestEventSummary', description='TestEventDescription',
                                             team=self.team, category=self.category)

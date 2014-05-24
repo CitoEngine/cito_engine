@@ -30,13 +30,13 @@ class TestEventViews(TestCase):
         Perms.objects.create(user=self.user, access_level=1).save()
         self.event = factories.EventFactory()
         self.event_url = '/events/view/%s' % self.event.id
-        self.team = factories.TeamFactory()
+        self.team = factories.TeamFactory.create()
         self.category = factories.CategoryFactory()
-        self.team1 = factories.TeamFactory(name='Team1')
+        self.team1 = factories.TeamFactory.create(name='Team1')
         self.event1 = factories.EventFactory(summary='Event1', team=self.team1)
-        self.team2 = factories.TeamFactory(name='Team2')
+        self.team2 = factories.TeamFactory.create(name='Team2')
         self.event2 = factories.EventFactory(summary='Event2', team=self.team2)
-        self.team3 = factories.TeamFactory(name='Team3')
+        self.team3 = factories.TeamFactory.create(name='Team3')
         self.event3 = factories.EventFactory(summary='Event3', team=self.team3)
 
     def login(self):
@@ -149,7 +149,7 @@ class TestEventViews(TestCase):
         """
         data = dict(summary='HodorSummary',
                     description='HodorDescription',
-                    team=factories.TeamFactory(name='HodorTeam').id,
+                    team=factories.TeamFactory.create(name='HodorTeam').id,
                     severity='S0',
                     category=factories.CategoryFactory(categoryType='HodorCategory').id,
                     status=True)
