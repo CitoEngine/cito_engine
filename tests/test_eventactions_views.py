@@ -28,8 +28,8 @@ class TestEventActionViews(TestCase):
         Perms.objects.create(user=self.user, access_level=1).save()
         self.event = factories.EventFactory()
         self.eventaction = factories.EventActionFactory()
-        self.add_url = '/eventactions/add/%s' % self.event.id
-        self.edit_url = '/eventactions/edit/%s' % self.eventaction.id
+        self.add_url = '/eventactions/add/%s/' % self.event.id
+        self.edit_url = '/eventactions/edit/%s/' % self.eventaction.id
 
     def test_add_eventaction_without_login(self):
         """
@@ -47,22 +47,25 @@ class TestEventActionViews(TestCase):
         response = self.client.post(self.add_url, {}, follow=True)
         self.assertTemplateUsed(response, 'unauthorized.html')
 
-    # TODO: Fix the assertRedirects error 200 != 302
-    # def test_add_eventaction(self):
-    #     """
-    #     Add event actions
-    #     """
-    #     self.client.login(username='hodor', password='hodor')
-    #     data = {'event': self.event.id,
-    #             'plugin': 1,
-    #             'isEnabled': 1,
-    #             'threshold_count': 1,
-    #             'threshold_timer': 60,
-    #             'pluginParameters': 'HODOR_RULES'}
-    #     response = self.client.post(self.add_url, data, follow=True)
-    #     self.assertRedirects(response, '/events/view/%s' % self.event.id)
-    #     response = self.client.get('/events/view/%s' % self.event.id)
-    #     self.assertContains(response, 'HODOR_RULES')
+    def test_add_eventaction(self):
+        """
+        Add event action
+        """
+        plugin1 = factories.PluginFactory(name='HodorPlugin')
+        self.client.login(username='hodor', password='hodor')
+        data = {'event': self.event.id,
+                'plugin': plugin1.id,
+                'isEnabled': 1,
+                'threshold_count': 1,
+                'threshold_timer': 60,
+                'pluginParameters': 'HODOR_RULES'}
+        response = self.client.post(self.add_url, data, follow=True)
+        print response
+
+        self.assertRedirects(response, '/events/view/%s/' % self.event.id)
+        response = self.client.get('/events/view/%s/' % self.event.id)
+        self.assertContains(response, 'HODOR_RULES')
+        self.assertContains(response, 'HodorPlugin')
 
     def test_edit_eventaction_without_login(self):
         """
@@ -94,6 +97,6 @@ class TestEventActionViews(TestCase):
         response = self.client.get(self.edit_url)
         self.assertContains(response, '__EVENTID__')
         postresponse = self.client.post(self.edit_url, data)
-        self.assertRedirects(postresponse, '/events/view/%s' % self.eventaction.event.id)
+        self.assertRedirects(postresponse, '/events/view/%s/' % self.eventaction.event.id)
         response = self.client.get(self.edit_url)
         self.assertContains(response, 'HODOR_RULES')
