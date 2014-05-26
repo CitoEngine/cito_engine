@@ -15,14 +15,15 @@ limitations under the License.
 
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from appauth.models import Perms
 from . import factories
 
 
 class TestDashboardViews(TestCase):
     def setUp(self):
         self.client = Client()
-        for name in ['alpha', 'omega']:
-            factories.TeamFactory.create(name=name)
+        self.alpha = factories.TeamFactory.create(name='alpha')
+        self.omega = factories.TeamFactory.create(name='omega')
         self.user = User.objects.create_user(username='phil', password='phil',
                                              first_name='phil', last_name='phil',
                                              email='phil@planet.hodor')
@@ -42,3 +43,12 @@ class TestDashboardViews(TestCase):
         response = self.client.get('/dashboard/')
         self.assertContains(response, 'alpha')
         self.assertContains(response, 'omega')
+
+    def test_individual_team_dashboard(self):
+        """
+        View per team dashboard
+        """
+        self.client.login(username='phil', password='phil')
+        Perms.objects.create(user=self.user, access_level=4).save()
+        response = self.client.get('/incidents/view/%d/active/' % self.alpha.id)
+        self.assertEqual(response.status_code, 200)
