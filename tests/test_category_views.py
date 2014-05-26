@@ -16,6 +16,7 @@ limitations under the License.
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from appauth.models import Perms
+from cito_engine.models import Category
 from . import factories
 
 
@@ -37,7 +38,7 @@ class TestCategoryViews(TestCase):
 
     def test_view_categories(self):
         """
-        Testing with valid prems
+        Testing with valid perms
         """
         Perms.objects.create(user=self.user, access_level=4).save()
         self.client.login(username='hodor', password='hodor')
@@ -45,13 +46,31 @@ class TestCategoryViews(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_categories.html')
 
+    def test_view_all_categories_with_wrong_perms(self):
+        """
+        View all categories with invalid perms
+        """
+        self.client.login(username='hodor', password='hodor')
+        Perms.objects.create(user=self.user, access_level=5).save()
+        response = self.client.get('/categories/', {}, follow=True)
+        self.assertTemplateUsed(response, 'unauthorized.html')
+
     def test_add_category_with_wrong_perms(self):
         """
-        Testing with invalid prems
+        Add category with invalid perms
         """
         self.client.login(username='hodor', password='hodor')
         Perms.objects.create(user=self.user, access_level=4).save()
         response = self.client.post('/categories/add', {}, follow=True)
+        self.assertTemplateUsed(response, 'unauthorized.html')
+
+    def test_edit_category_with_wrong_perms(self):
+        """
+        Edit category with invalid perms
+        """
+        self.client.login(username='hodor', password='hodor')
+        Perms.objects.create(user=self.user, access_level=4).save()
+        response = self.client.post('/categories/edit/%d' % self.category1.id, {}, follow=True)
         self.assertTemplateUsed(response, 'unauthorized.html')
 
     def test_add_category_with_perms(self):
@@ -96,3 +115,17 @@ class TestCategoryViews(TestCase):
         # Edit the category
         response = self.client.post('/categories/edit/%s' % self.category1.id, {'categoryType': 'AnotherTestCategoryType'})
         self.assertContains(response, "already exists")
+
+    def test_view_all_categories_without_any_records(self):
+        """
+        Check behaviour of view_all_categories if no category exists.
+        We should not get any errors
+        """
+        self.client.login(username='hodor', password='hodor')
+        Perms.objects.create(user=self.user, access_level=2).save()
+        Category.objects.all().delete()
+        response = self.client.get('/categories/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'view_categories.html')
+        self.assertNotContains(response, 'TestCategoryType')
+        self.assertNotContains(response, 'AnotherTestCategoryType')
