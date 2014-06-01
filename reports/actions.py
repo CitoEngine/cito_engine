@@ -72,10 +72,10 @@ def get_report_json_formatter(data, dimension):
     return response
 
 
-def get_report_csv_formatter(data, dimension):
+def get_report_csv_formatter(data, dimension, filename='cito_report.csv'):
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="cito_report.csv"'
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     writer = csv.writer(response)
     if data:
         writer.writerow([unicode(fieldname) for fieldname in data[0]._meta.get_all_field_names()])
