@@ -13,9 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import redirect, render_to_response
 from django.forms.formsets import formset_factory
-from django.forms import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from cito_engine.forms import tools_form, events
@@ -33,13 +32,17 @@ def bulk_upload_events(request):
         # If we got a bunch of lines for events
         if 'list_of_items' in request.POST:
             list_of_events = request.POST.get('list_of_items')
+            severity = request.POST.get('severity')
+            category = request.POST.get('category')
+            team = request.POST.get('team')
             initial_data = []
             if list_of_events:
                 for event_summary in list_of_events.splitlines():
                     initial_data.append({'summary': event_summary,
                                          'description': event_summary,
-                                         'severity': 'S3',
-                                         'team': request.user.team_set.all()[0],
+                                         'severity': severity,
+                                         'team': team,
+                                         'category': category,
                                          })
                 render_vars['formset'] = BulkEventsFormset(initial=initial_data)
             else:
@@ -62,12 +65,14 @@ def bulk_upload_events(request):
     return render_to_response('bulk_upload.html', render_vars, context_instance=RequestContext(request))
 
 
-
 @login_required(login_url='/login/')
 def show_bulk_upload_form(request, upload_item):
     form = tools_form.BulkUploadForm()
     render_vars = dict()
     render_vars['form'] = form
+    render_vars['box_title'] = 'Bulk add events'
+    render_vars['page_title'] = 'Bulk add events'
+
     if upload_item == 'events':
         render_vars['form_action'] = '/tools/bulkupload/events/confirm/'
     return render_to_response('generic_form.html', render_vars, context_instance=RequestContext(request))
