@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.forms import ModelForm, Form, ChoiceField, CharField
+from django.forms import ModelForm, Form, ChoiceField, CharField, BooleanField
 from cito_engine.models import Event, Team
 
 
@@ -35,6 +35,8 @@ class EventSearchForm(Form):
         team_list.append((team.id, team.name))
     team = ChoiceField(choices=team_list, label="Team")
     search_term = CharField(max_length=64, required=False, label="Summary")
+    csv_export = BooleanField(label="Export as CSV", required=False)
+
 
     def __init__(self, *args, **kwargs):
         super(Form, self).__init__(*args, **kwargs)

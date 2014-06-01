@@ -19,7 +19,7 @@ from django.template import RequestContext
 from cito_engine.forms import events
 from cito_engine.models import Event, Team, EventAction
 from cito_engine.actions.event_actions import dispatcher_dry_run
-
+from cito_engine.actions import export_utils
 
 @login_required(login_url='/login/')
 def add_event(request):
@@ -60,7 +60,12 @@ def view_events(request):
             if team_id > 0:
                 team = Team.objects.get(pk=team_id)
                 query_params['team'] = team
+                team_name = team.name
+            else:
+                team_name = 'all'
             render_vars['events'] = Event.objects.filter(**query_params)
+            if search_form.cleaned_data.get('csv_export'):
+                return export_utils.get_events_csv_formatter(render_vars['events'], filename='%s_events.csv' % team_name)
             render_vars['search_term'] = search_term
             render_vars['search_form'] = search_form
 
