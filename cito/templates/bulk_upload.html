@@ -5,10 +5,10 @@
 
         <div class="container-fluid">
             {% include 'noscript.html' %}
-            <div id="content" class="span10">
+            <div id="content" class="span12">
             <!-- content starts -->
+            {% if not errors %}
             <div class="row-fluid sortable">
-            {%  if not formSaved and not errors%}
                 <div class="box span12">
                     <div class="box-header well">
                         <h2><i class="icon-plus"></i>{{ box_title }}</h2>
@@ -17,29 +17,14 @@
                     <div class="box-content">
                         <form class="form-horizontal" method="POST" accept-charset="." {% if form_action %} action="{{ form_action }}"{% endif %}>
                             {% csrf_token %}
-                            <legend></legend>
-                         {% for field in form.hidden_fields %}
-                                {{ field }}
-                          {% endfor %}
+                            {{ formset.management_form }}
+                                {% for form in formset %}
+                                  <p class="badge badge-success">Event {{ forloop.counter }}</p>
+                                    <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                        {{ form }}
+                                    </table>
 
-                              {% for field in form.visible_fields %}
-                                {% if not field.errors %}
-                                <div class="control-group">
-                                  <label class="control-label" for="typeahead">{{ field.label_tag }}</label>
-                                  <div class="controls col-lg-4">
-                                      {{ field }}
-                                  </div>
-                                </div>
-                                {% else %}
-                               <div class="control-group error">
-								<label class="control-label" for="inputError">{{ field.label_tag }}</label>
-								<div class="controls">
-								  {{ field }}
-								  <span class="help-inline">{{ field.errors }}</span>
-								</div>
-							    </div>
-                                {% endif %}
-                              {% endfor %}
+                                {% endfor %}
                             <div>
                                 <button type="submit" class="btn btn-primary btn-small">Save Button</button>
                                 <button type="button" class="btn btn-small"  onclick="javascript:history.go(-1)">Cancel</button>
@@ -48,14 +33,7 @@
 
                      </div>
                 </div>
-            {% elif formSaved %}
-                <div class="alert alert-success span12">
-                {{ responseText }}
-                </div>
             </div>
-
-            </div><!--/.fluid-container-->
-        </div>
             {% elif errors %}
 {#                <div class="btn-group span12">#}
                     <div class="alert alert-error span12">
@@ -68,4 +46,6 @@
                     <button type="button" class="btn btn-danger" onclick="javascript:history.go(-1)">Go Back</button>
 {#                </div>#}
             {% endif %}
+        </div>
+    </div>
 {% include 'footer.html' %}
