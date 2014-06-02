@@ -27,8 +27,6 @@ def bulk_upload_events(request):
     if request.method != 'POST':
         return redirect('/incidents/')
     else:
-        print request.POST.keys()
-        # list_of_events = request.POST.get('list_of_items')
         # If we got a bunch of lines for events
         if 'list_of_items' in request.POST:
             list_of_events = request.POST.get('list_of_items')
