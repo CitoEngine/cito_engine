@@ -20,7 +20,6 @@ from cito_engine.models import Event, Team
 class EventForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EventForm, self).__init__(*args, **kwargs)
-        # self.fields['summary'].widget.attrs['onClick'] = "this.value ='3';"
         self.fields['description'].widget.attrs['rows'] = "5"
 
     class Meta:
@@ -29,14 +28,10 @@ class EventForm(ModelForm):
 
 class EventSearchForm(Form):
     team_list = [(0, u'All')]
-
-    teams = Team.objects.all()
-    for team in teams:
-        team_list.append((team.id, team.name))
+    [team_list.append((t.id, t.name)) for t in Team.objects.all()]
     team = ChoiceField(choices=team_list, label="Team")
     search_term = CharField(max_length=64, required=False, label="Summary")
     csv_export = BooleanField(label="Export as CSV", required=False)
-
 
     def __init__(self, *args, **kwargs):
         super(Form, self).__init__(*args, **kwargs)
