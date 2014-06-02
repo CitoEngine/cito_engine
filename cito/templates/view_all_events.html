@@ -34,6 +34,7 @@
                                         <th>Severity</th>
                                         <th>Team</th>
                                         <th>Summary</th>
+                                        <th>Category</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -46,6 +47,7 @@
                                         <td width="10%">{{ event.severity }}</td>
                                         <td>{{ event.team }}</td>
                                         <td>{{ event.summary }}</td>
+                                        <td>{{ event.category }}</td>
                                         <td>{% if event.status %} Enabled {% else %} Disabled {% endif %}</td>
                                         <td width="20%">
                                             <div class="btn-group"><a class="btn btn-info btn-mini" href="/events/view/{{ event.id }}"><i class="icon-list"></i>View</a></div>
