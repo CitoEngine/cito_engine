@@ -22,6 +22,16 @@ class EventForm(ModelForm):
         super(EventForm, self).__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['rows'] = "5"
 
+    def clean(self):
+        cleaned_data = super(EventForm, self).clean()
+        summary = cleaned_data['summary']
+        team = cleaned_data['team']
+        category = cleaned_data['category']
+        if Event.objects.filter(summary__iexact=summary, team=team, category=category).count() > 1:
+            msg = u'An event, with this summary, already exists in your team.'
+            self._errors['summary'] = self.error_class([msg])
+        return cleaned_data
+
     class Meta:
         model = Event
 
