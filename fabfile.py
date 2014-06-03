@@ -92,15 +92,16 @@ def deploy():
 #################
 
 # noinspection PyBroadException
-def dj_dbconfig(createdb=False):
+def dj_dbconfig(createdb=True):
     """
     Setup mysql root password, create the db and update the config
     """
     env.mysql_user = prompt(green("Enter MySQL username: "))
     env.mysql_password = getpass(green("Enter MySQL password (will not display on screen): "))
     env.mysql_dbname = prompt(green("Enter MySQL DB Name (default=cito): "), default='cito')
-    if createdb:
-        run('mysqladmin -u %(mysql_user)s -p%(mysql_password)s create %(mysql_dbname)s' % env)
+    with warn_only():
+        if createdb:
+            run('mysqladmin -u %(mysql_user)s -p%(mysql_password)s create %(mysql_dbname)s' % env)
 
     with cd(env.app_dir):
         sudo('chown %(user)s %(app_dir)s/%(django_settings_file)s' % env)

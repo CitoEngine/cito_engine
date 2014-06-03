@@ -70,7 +70,7 @@ def add_team(request):
         if form.is_valid():
             team_name = form.cleaned_data['name']
             if Team.objects.filter(name__iexact=team_name).count() > 0:
-                errors = ['Team named \"%s\" already exists' % team_name]
+                errors = ['Team with name \"%s\" already exists.' % team_name]
             else:
                 form.save()
                 return redirect('/teams/')

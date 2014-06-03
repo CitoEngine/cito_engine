@@ -16,8 +16,8 @@ limitations under the License.
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from appauth.models import Perms
-from cito_engine.actions import event_actions
-from mock import patch, call
+from mock import patch, call, Mock
+from requests.exceptions import ConnectionError
 from . import factories
 
 
@@ -30,13 +30,13 @@ class TestEventViews(TestCase):
         Perms.objects.create(user=self.user, access_level=1).save()
         self.event = factories.EventFactory()
         self.event_url = '/events/view/%s' % self.event.id
-        self.team = factories.TeamFactory()
+        self.team = factories.TeamFactory.create()
         self.category = factories.CategoryFactory()
-        self.team1 = factories.TeamFactory(name='Team1')
+        self.team1 = factories.TeamFactory.create(name='Team1')
         self.event1 = factories.EventFactory(summary='Event1', team=self.team1)
-        self.team2 = factories.TeamFactory(name='Team2')
+        self.team2 = factories.TeamFactory.create(name='Team2')
         self.event2 = factories.EventFactory(summary='Event2', team=self.team2)
-        self.team3 = factories.TeamFactory(name='Team3')
+        self.team3 = factories.TeamFactory.create(name='Team3')
         self.event3 = factories.EventFactory(summary='Event3', team=self.team3)
 
     def login(self):
@@ -136,12 +136,42 @@ class TestEventViews(TestCase):
         self.assertContains(response, 'eventaction2_param')
         self.assertNotContains(response, 'Event1')
 
-    # TODO: Use mock to run a test for event_actions.requests.post
-    # def test_view_single_event_exec_dry_run(self):
-    #     """
-    #     Executes dry_run for eventaction in view_single_event
-    #     """
-    #     pass
+    @patch('cito_engine.actions.event_actions.requests')
+    def test_view_single_event_exec_dry_run(self, mock_requests):
+        """
+        Executes dry_run for eventaction in view_single_event
+        """
+        mock_requests.post.return_value.status_code = 200
+        mock_requests.post.return_value.text = 'OK:Computer'
+        self.login()
+        event_action_param = '{"__EVENTID__", "__INCIDENTID__", "__ELEMENT__", "__MESSAGE__"}'
+        event_action = factories.EventActionFactory(event=self.event, pluginParameters=event_action_param)
+        response = self.client.post('/events/view/%d' % self.event.id, data={'event_id': self.event.id,
+                                                                             'event_action_id': event_action.id})
+        expected_json_string = '{"plugin": "%s", "parameters": ' \
+                               '{"%s", "test_incident_id", "test_element_name", "test_message"}}' \
+                               % (event_action.plugin.name, self.event.id)
+
+        self.assertEquals(mock_requests.post.call_args_list,
+                          [call(u'%s' % event_action.plugin.server.url+'/runplugin',
+                                verify=event_action.plugin.server.ssl_verify,
+                                data=u'%s' % expected_json_string
+                                )]
+                          )
+
+    # Test a failure scenario
+    @patch('cito_engine.actions.event_actions.requests')
+    def test_view_single_event_dry_run_with_failure(self, mock_requests):
+        """
+        Executes dry_run and expects a failure
+        """
+        mock_requests.post = Mock(side_effect=ConnectionError)
+        self.login()
+        event_action_param = '{"__EVENTID__", "__INCIDENTID__", "__ELEMENT__", "__MESSAGE__"}'
+        event_action = factories.EventActionFactory(event=self.event, pluginParameters=event_action_param)
+        response = self.client.post('/events/view/%d' % self.event.id, data={'event_id': self.event.id,
+                                                                             'event_action_id': event_action.id})
+        self.assertContains(response, 'Error executing Plugin:')
 
     def test_edit_event(self):
         """
@@ -149,7 +179,7 @@ class TestEventViews(TestCase):
         """
         data = dict(summary='HodorSummary',
                     description='HodorDescription',
-                    team=factories.TeamFactory(name='HodorTeam').id,
+                    team=factories.TeamFactory.create(name='HodorTeam').id,
                     severity='S0',
                     category=factories.CategoryFactory(categoryType='HodorCategory').id,
                     status=True)

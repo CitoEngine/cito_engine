@@ -53,7 +53,7 @@ def login_user(request):
             else:
                 state = "Your account is inactive, please contact the administrator."
         else:
-            state = "Username/Pasword incorrect"
+            state = "Username/Password incorrect"
 
     return render_to_response('login.html',
                               {'state': state, 'username': username, 'redirect_to': redirect_to},

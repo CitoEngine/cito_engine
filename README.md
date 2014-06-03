@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/CitoEngine/cito_engine.svg?branch=master)](https://travis-ci.org/CitoEngine/cito_engine)
+[![Coverage Status](https://coveralls.io/repos/CitoEngine/cito_engine/badge.png?branch=v0.9.0)](https://coveralls.io/r/CitoEngine/cito_engine?branch=v0.9.0)
 CitoEngine: **Alert management and automation tool**
 ==========
 

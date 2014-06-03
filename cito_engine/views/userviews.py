@@ -66,7 +66,7 @@ def modify_user_team_membership(request, toggle):
             user.team_set.add(team)
         elif toggle == 'remove':
             user.team_set.remove(team)
-        return redirect('/users/view/%s' % user_id)
+        return redirect('/users/view/%s/' % user_id)
     else:
         return HttpResponseBadRequest()
 
@@ -82,10 +82,13 @@ def update_user_perms(request):
         if form.is_valid():
             access_level = form.cleaned_data['access_level']
             try:
-                Perms.objects.filter(user=user).update(access_level=access_level)
+                u = Perms.objects.get(user=user)
+                if u:
+                    u.access_level = access_level
+                    u.save()
             except Perms.DoesNotExist:
                 Perms.objects.create(user=user, access_level=access_level)
-            return redirect('/users/view/%s' % user_id)
+            return redirect('/users/view/%s/' % user_id)
         else:
             return HttpResponseBadRequest()
     else:
@@ -137,7 +140,7 @@ def edit_user(request, user_id):
             if password:
                 user.set_password(password)
                 user.save()
-            return redirect('/users/view/%s' % user.id)
+            return redirect('/users/view/%s/' % user.id)
     else:
         form_vars = {'first_name': user.first_name,
                      'last_name': user.last_name,
@@ -164,4 +167,4 @@ def toggle_user(request):
         else:
             user.is_active = True
         user.save()
-        return redirect('/users/view/%s' % user_id)
+        return redirect('/users/view/%s/' % user_id)

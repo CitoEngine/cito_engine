@@ -57,3 +57,5 @@ docs/_build/
 */.DS_Store
 .DS_Store
 *_dev_settings.py
+*.log
+.vagrant/

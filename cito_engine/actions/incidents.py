@@ -25,7 +25,7 @@ from .event_actions import update_eventaction_counters
 
 
 
-class ProcessIncident():
+class ProcessIncident(object):
     def __init__(self, incident, message):
         self.incident = incident
         self.incident_message = message
@@ -142,7 +142,7 @@ def add_incident(e, timestamp):
 
 
 def add_incident_log(incident, msg, incident_time):
-    logger = logging.getLogger('poller_ogger')
+    logger = logging.getLogger('poller_logger')
     try:
         IncidentLog.objects.create(incident=incident, msg=msg, timestamp=incident_time).save()
     except Exception as e:
@@ -153,7 +153,7 @@ def close_duplicate_incidents(event, element):
     """
     Closes all duplicate 'Active' incidents.
     """
-    logger = logging.getLogger('poller_ogger')
+    logger = logging.getLogger('poller_logger')
     try:
         incidents = Incident.objects.filter(event=event, element__iexact=element, status='Active')
         #TODO: Keep the last active incident open and close others

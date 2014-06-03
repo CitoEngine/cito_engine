@@ -88,3 +88,8 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
                         url(r'^content/(?P<path>.*)$', 'django.views.static.serve',
                             {'document_root': settings.STATIC_FILES}),)
+
+urlpatterns += patterns('',
+                        url(r'^tools/bulkupload/(?P<upload_item>\w+)/$', 'cito_engine.views.tools.show_bulk_upload_form'),
+                        url(r'^tools/bulkupload/events/confirm/$', 'cito_engine.views.tools.bulk_upload_events'),
+)

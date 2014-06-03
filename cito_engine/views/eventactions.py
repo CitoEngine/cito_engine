@@ -41,7 +41,7 @@ def edit_eventaction(request, eventaction_id):
                          dateUpdated=timezone.now(),
                          )
             EventAction.objects.filter(pk=eventaction_id).update(**query)
-            return redirect('/events/view/%s' % eventaction.event.id)
+            return redirect('/events/view/%s/' % eventaction.event.id)
         #Form is invalid, send the plugin params
         else:
             try:
@@ -69,7 +69,7 @@ def add_eventaction(request, event_id):
         form = eventactions.EventActionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/events/view/%s' % event.id)
+            return redirect('/events/view/%s/' % event.id)
         else:
             errors = form.errors
     else:

@@ -86,12 +86,13 @@ def edit_pluginserver(request, pluginserver_id):
             name = form.cleaned_data.get('name')
             url = form.cleaned_data.get('url')
             status = form.cleaned_data.get('status')
+            ssl_verify = form.cleaned_data.get('ssl_verify')
             if PluginServer.objects.filter(~Q(pk=pluginserver_id), url__iexact=url).count() > 0:
                 errors = ['A server with URL: %s already exists' % url]
             else:
-                query = dict(name=name, url=url, status=status)
+                query = dict(name=name, url=url, status=status, ssl_verify=ssl_verify)
                 PluginServer.objects.filter(pk=pluginserver_id).update(**query)
-                return redirect('/pluginservers/view/%s' % pluginserver_id)
+                return redirect('/pluginservers/view/%s/' % pluginserver_id)
     else:
         form = pluginserver.PluginServerForm(instance=ps)
     return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
@@ -102,4 +103,4 @@ def refresh_pluginserver(request, pluginserver_id):
         return render_to_response('unauthorized.html', context_instance=RequestContext(request))
     plugin_server = get_object_or_404(PluginServer, pk=pluginserver_id)
     pluginpoller.pluginpoller(plugin_server)
-    return redirect('/pluginservers/view/%s' % pluginserver_id)
+    return redirect('/pluginservers/view/%s/' % pluginserver_id)
