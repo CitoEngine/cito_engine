@@ -55,8 +55,15 @@ class EventPoller(object):
                              (k, parsed_json))
                 return False
 
+        # Make sure we received a valid timestamp
+        try:
+            timestamp = int(parsed_json['timestamp'])
+        except:
+            logger.error('Invalid timestamp in message:%s' % message)
+            return False
+
         # Add incident to Database
-        incident = add_incident(e, parsed_json['timestamp'])
+        incident = add_incident(e, timestamp)
 
         # Check incident thresholds and fire events
         if incident and incident.status == 'Active':
@@ -64,7 +71,7 @@ class EventPoller(object):
         logger.info('MsgOk: EventID:%s, Element:%s, Message:%s on Timestamp:%s' % (e['eventid'],
                                                                                    e['element'],
                                                                                    e['message'],
-                                                                                   parsed_json['timestamp']))
+                                                                                   timestamp))
         return True
 
     def _get_sqs_messages(self):
