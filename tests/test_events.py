@@ -99,3 +99,40 @@ class EventTestCase(TestCase):
         self.assertGreater(incident2.id, incident.id,
                           msg='New incident was not created upon closing a previous one.')
 
+    def test_invalid_strings_to_add_incident(self):
+        """Sending invalid values for event json
+        """
+        data = dict(eventid=1,
+                    element='foo',
+                    message='baz')
+        timestamp = 13439471
+
+        # Bad eventid
+        data['eventid'] = 'a'
+        response = add_incident(data, timestamp)
+        self.assertIsNone(response)
+
+        # empty eventid
+        data['eventid'] = ''
+        response = add_incident(data, timestamp)
+        self.assertIsNone(response)
+
+        # Empty element
+        data['eventid'] = 1
+        data['element'] = ''
+        response = add_incident(data, timestamp)
+        self.assertIsNone(response)
+
+        # Empty message
+        data['element'] = 'foo'
+        data['message'] = ''
+        response = add_incident(data, timestamp)
+        self.assertIsNone(response)
+
+        # No timestamp
+        response = add_incident(data, '')
+        self.assertIsNone(response)
+
+        # Invalid timestamp
+        response = add_incident(data, 'foo')
+        self.assertIsNone(response)
