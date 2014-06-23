@@ -24,7 +24,6 @@ from . import json_formatter
 from .event_actions import update_eventaction_counters
 
 
-
 class ProcessIncident(object):
     def __init__(self, incident, message):
         self.incident = incident
@@ -62,7 +61,7 @@ class ProcessIncident(object):
             response = requests.post(event_action.plugin.server.url+'/runplugin', data=plugin_json,
                                      verify=event_action.plugin.server.ssl_verify)
             EventActionLog.objects.create(eventAction=event_action, text=response.text, incident=self.incident)
-        except BaseException as e:
+        except Exception as e:
             event_action_error = "Error executing Plugin:%s: ErrMsg:%s %s" % (event_action.plugin.name, e.message, e.args)
             EventActionLog.objects.create(eventAction=event_action, text=event_action_error, incident=self.incident)
             self.logger.error(event_action_error)
@@ -79,14 +78,22 @@ def add_incident(e, timestamp):
     logger = logging.getLogger('poller_logger')
     try:
         event_id = int(e['eventid'])
-    except Exception:
-        logger.error('Bad EventID:%s, variableType:%s' % (e, type(e)))
-    element = e['element']
-    msg = e['message']
+        element = e['element']
+        msg = e['message']
+    except Exception as excep:
+        logger.error('Bad Incident:[%s], reason:[%s] message will be ignored.' % (excep, e))
+        return
+
+    # Ignore incident if any field is empty
+    if not event_id or not element or not msg:
+        logger.error('Bad Incident:[%s], reason:one or more fields are empty' % e)
+        return
+
+    # Ignore incident if event does not exist
     try:
         event = Event.objects.get(pk=event_id)
     except Event.DoesNotExist:
-        return False
+        return
     #TODO: SQL sanity checks
     #TODO: Msg len check??
 
@@ -161,7 +168,7 @@ def close_duplicate_incidents(event, element):
             logger.warning('closing duplicate incident:%s ' % i.id)
             i.status = 'Cleared'
             i.save()
-    except BaseException:
+    except Exception:
         logger.error('Could not close multiple incidents on event:%s, element:%s' % (event.id, element))
 
     return

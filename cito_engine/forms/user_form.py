@@ -27,10 +27,16 @@ class UserCreationForm(forms.Form):
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
     email = forms.EmailField()
     access_level = forms.ChoiceField(choices=Perms.PERMISSION_LEVEL)
-    team_list = []
-    for team in Team.objects.all():
-        team_list.append((team.id, team.name))
-    teams = forms.MultipleChoiceField(choices=team_list)
+
+    teams = forms.MultipleChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.team_list = []
+        for team in Team.objects.all():
+            self.team_list.append((team.id, team.name))
+        self.fields['teams'].choices = self.team_list
+
 
     def clean_username(self):
         username = self.cleaned_data['username']
