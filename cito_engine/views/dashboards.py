@@ -46,5 +46,6 @@ def teamview(request):
         team_dashboard[i.event.team.name]['acknowledged'] += 1
 
     return render_to_response('dashboard_team_views.html',
-                              {'team_dashboard': team_dashboard, },
+                              {'team_dashboard': team_dashboard,
+                               'auto_refresh_page': True},
                               context_instance=RequestContext(request))

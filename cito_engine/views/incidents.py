@@ -74,6 +74,7 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
         render_vars['incidents'] = paginator.page(paginator.num_pages)
 
     render_vars['box_title'] = render_vars['page_title']
+    render_vars['auto_refresh_page'] = True
     return render_to_response('view_all_incidents.html', render_vars, context_instance=RequestContext(request))
 
 
