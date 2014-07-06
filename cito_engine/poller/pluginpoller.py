@@ -31,7 +31,7 @@ def pluginpoller(server):
 
     try:
         response = requests.get(url, verify=server.ssl_verify)
-    except BaseException, e:
+    except Exception, e:
         logger.error('Could not connect to PluginServer: %s [EXCEPTION] %s' % (url, e))
         return False
 
@@ -62,8 +62,8 @@ def pluginpoller(server):
             logger.info('Plugin: %s added' % k['plugins']['name'])
         except Plugin.MultipleObjectsReturned:
             logger.error("More than one plugin exists for %s, remove the duplicates!" % k['plugins']['name'])
-        except BaseException as e:
-            logger.error("Could not add plugin: %s" % e.args)
+        except Exception as e:
+            logger.error("Could not add plugin, reason:%s" % e)
 
     #Disable all deprecated plugins
     plugins = Plugin.objects.filter(server=server)
