@@ -62,7 +62,7 @@ class ProcessIncident(object):
                                      verify=event_action.plugin.server.ssl_verify)
             EventActionLog.objects.create(eventAction=event_action, text=response.text, incident=self.incident)
         except Exception as e:
-            event_action_error = "Error executing Plugin:%s: ErrMsg:%s %s" % (event_action.plugin.name, e.message, e.args)
+            event_action_error = "Error executing Plugin:%s: ErrMsg:%s" % (event_action.plugin.name, e)
             EventActionLog.objects.create(eventAction=event_action, text=event_action_error, incident=self.incident)
             self.logger.error(event_action_error)
         finally:
