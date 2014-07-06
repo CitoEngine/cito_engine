@@ -34,8 +34,8 @@ def dispatcher_dry_run(event, event_action):
         response = requests.post(event_action.plugin.server.url+'/runplugin', data=plugin_json,
                                  verify=event_action.plugin.server.ssl_verify)
         dry_run_result = response.text
-    except BaseException as e:
-        dry_run_result = "Error executing Plugin:%s: %s" % (event_action.plugin.name, e.args)
+    except Exception as e:
+        dry_run_result = "Error executing Plugin:%s: reason:%s" % (event_action.plugin.name, e)
     finally:
         return dry_run_result
 
