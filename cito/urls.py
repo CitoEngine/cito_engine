@@ -81,6 +81,7 @@ urlpatterns += patterns('',
                         url(r'^reports/allincidents/$', 'reports.views.report_all_incidents'),
                         url(r'^reports/allevents/$', 'reports.views.report_events_in_system'),
                         url(r'^reports/topincidents/$', 'reports.views.report_incidents_per_event'),
+                        url(r'^reports/mostalerted/$', 'reports.views.report_most_alerted_elements'),
                         )
 
 # urlpatterns += staticfiles_urlpatterns()

@@ -74,3 +74,20 @@ class EventsPerTeam(Form):
         super(Form, self).__init__(*args, **kwargs)
         # change a widget attribute:
         self.fields['event_id'].widget.attrs["placeholder"] = 'Search by EventID or leave blank'
+
+
+class MostAlertedElements(Form):
+    time_choices = (
+        ('1', 'Last 24hours'),
+        ('7', 'Last week'),
+        ('30', '4 weeks'),
+    )
+    result_limit_choices = (
+        ('10', '10'),
+        ('25', '25'),
+        ('50', '50'),
+        ('100', '100'),
+    )
+
+    timerange = ChoiceField(choices=time_choices, label="Range")
+    result_limit = ChoiceField(choices=result_limit_choices, label="Results")

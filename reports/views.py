@@ -17,8 +17,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from cito_engine.models import Team, Event
-from .actions import get_report_all_incidents, get_events_in_system, get_report_json_formatter, get_incidents_per_event, get_report_csv_formatter
-from .forms import AllIncidentsReportForm, EventsPerTeam
+from . import actions
+from .forms import AllIncidentsReportForm, EventsPerTeam, MostAlertedElements
 
 @login_required(login_url='/login/')
 def report_all_incidents(request):
@@ -54,10 +54,10 @@ def report_all_incidents(request):
                 dimension = 'hour'
             else:
                 dimension = 'day'
-            result = get_report_all_incidents(timerange, **query_params)
+            result = actions.get_report_all_incidents(timerange, **query_params)
             if form.cleaned_data.get('csv_export'):
-                return get_report_csv_formatter(result, dimension)
-            render_vars['json_data'] = get_report_json_formatter(result, dimension)
+                return actions.get_report_csv_formatter(result, dimension)
+            render_vars['json_data'] = actions.get_report_json_formatter(result, dimension)
             render_vars['page_title'] = 'Incidents for %s ' % render_vars['series_label']
             if query_params['severity'] == 'All':
                 render_vars['page_title'] += ' with any severity.'
@@ -81,7 +81,7 @@ def report_events_in_system(request):
     css_list = None
     if request.method == 'GET':
         render_vars = {
-            'events': get_events_in_system(),
+            'events': actions.get_events_in_system(),
             'page_title': 'Total number of events defined in the system',
             'include_view_pie': True,
             'js_list': js_list,
@@ -121,7 +121,7 @@ def report_incidents_per_event(request):
             if event_id:
                 query_params['event_id'] = int(event_id)
 
-            render_vars['incidents'] = get_incidents_per_event(**query_params)
+            render_vars['incidents'] = actions.get_incidents_per_event(**query_params)
 
             #get event sumary
             for i in render_vars['incidents']:
@@ -131,4 +131,19 @@ def report_incidents_per_event(request):
     else:
         render_vars['nothing_selected'] = True
     return render_to_response('reports_incidents_per_event.html', render_vars,
+                              context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def report_most_alerted_elements(request):
+    render_vars = dict()
+    render_vars['form'] = MostAlertedElements()
+    render_vars['page_title'] = 'Most alerted element'
+    if request.method == 'POST':
+        form = MostAlertedElements(request.POST)
+        render_vars['form'] = form
+        if form.is_valid():
+            days = int(form.cleaned_data.get('timerange'))
+            result_limit = form.cleaned_data.get('result_limit')
+            render_vars['elements_by_incidents'] = actions.get_most_alerted_elements(days, result_limit)
+    return render_to_response('reports_most_alerted_elements.html', render_vars,
                               context_instance=RequestContext(request))
