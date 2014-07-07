@@ -52,6 +52,7 @@ urlpatterns += patterns('',
                         url(r'^incidents/view/(?P<incident_status>\w+)/$', 'cito_engine.views.incidents.view_all_incidents'),
                         url(r'^incidents/view/(?P<team_id>\d+)/(?P<incident_status>\w+)/$', 'cito_engine.views.incidents.view_all_incidents'),
                         url(r'^incidents/toggle/$', 'cito_engine.views.incidents.toggle_incident_status'),
+                        url(r'^incidents/search/element/$', 'cito_engine.views.incidents.view_element'),
                         )
 urlpatterns += patterns('',
                         url(r'^comments/add/$', 'comments.views.add_comment'),
@@ -81,6 +82,7 @@ urlpatterns += patterns('',
                         url(r'^reports/allincidents/$', 'reports.views.report_all_incidents'),
                         url(r'^reports/allevents/$', 'reports.views.report_events_in_system'),
                         url(r'^reports/topincidents/$', 'reports.views.report_incidents_per_event'),
+                        url(r'^reports/mostalerted/$', 'reports.views.report_most_alerted_elements'),
                         )
 
 # urlpatterns += staticfiles_urlpatterns()

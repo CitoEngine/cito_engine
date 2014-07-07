@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from django.db.models import Count, Sum
 from django.utils import timezone
 from django.http import HttpResponse
-from cito_engine.models import Team, Event
+from cito_engine.models import Team, Event, Incident, IncidentLog
 
 from reports.models import DailyData, HourlyData
 
@@ -97,7 +97,7 @@ def get_events_in_system():
 
 
 def get_incidents_per_event(days, event_id=None, team_id=None, result_limit=10):
-    #TODO: Add range limit
+    # TODO: Add range limit
     result = []
     query_params = dict()
     time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
@@ -113,11 +113,23 @@ def get_incidents_per_event(days, event_id=None, team_id=None, result_limit=10):
             result.append({'team_id': event['team_id'],
                            'event_id': event['event_id'],
                            'total_count': event['total_count'],
-                           })
+            })
         except:
             print "Error querying for %s" % '__name__'
 
     return result
 
 
-
+def get_most_alerted_elements(days, result_limit=10):
+    """
+    Get most alerted elements
+    :param days:
+    :param result_limit:
+    :return:
+    """
+    time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
+    elements_by_unique_incidents = Incident.objects.values('element'). \
+                                       filter(firstEventTime__gte=time_range). \
+                                       annotate(uniq_count=Count('id'), total_count=Sum('total_incidents')). \
+                                       order_by('-uniq_count')[:result_limit]
+    return elements_by_unique_incidents

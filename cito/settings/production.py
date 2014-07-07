@@ -69,6 +69,14 @@ LOGGING = {
             'backupCount': 2,
             'formatter': 'standard',
         },
+        'auth_log_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOG_PATH.child('logs') + "/auth.log",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
     },
     'loggers': {
         'django.request': {
@@ -91,7 +99,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-
+        'auth_logger': {
+            'handlers': ['auth_log_handler'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }
 

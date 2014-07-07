@@ -12,6 +12,7 @@
                                  <thead>
                                     <tr>
                                         <th>Name</th>
+                                        <th>Username</th>
                                         <th>Team(s)</th>
                                         <th>Access Level</th>
                                         <th>Action</th>
@@ -23,6 +24,7 @@
                                 {% for user in users %}
                                     <tr>
                                     <td width="15%">{{ user.get_full_name }}</td>
+                                    <td width="15%">{{ user.username }}</td>
                                     <td width="35%"><div class="btn-group">
                                         {% for team in user.team_set.all %}
                                             <a class="btn btn-info btn-mini" href="/teams/edit/{{ team.id }}">{{ team.name }}</a>

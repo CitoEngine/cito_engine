@@ -16,7 +16,10 @@ limitations under the License.
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
+from ipware.ip import get_ip
 from appauth.models import Perms
+import logging
+auth_logger = logging.getLogger('auth_logger')
 
 
 def check_and_create_perms(user):
@@ -37,12 +40,14 @@ def login_user(request):
     username = ''
     password = ''
     redirect_to = request.REQUEST.get('next')
+    ip = get_ip(request)
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
         redirect_to = request.POST.get('redirect_to')
         user = authenticate(username=username, password=password)
         if user is not None:
+            auth_logger.info('User:%s logged in from %s' % (username, ip))
             if user.is_active:
                 login(request, user)
                 check_and_create_perms(user)
@@ -53,6 +58,7 @@ def login_user(request):
             else:
                 state = "Your account is inactive, please contact the administrator."
         else:
+            auth_logger.info('Failed login attempt from user:%s from %s' % (username, ip))
             state = "Username/Password incorrect"
 
     return render_to_response('login.html',
@@ -62,4 +68,6 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
+    ip = get_ip(request)
+    auth_logger.info('User:%s logged out from %s' % (request.user.username, ip))
     return render_to_response('logout.html', context_instance=RequestContext(request))

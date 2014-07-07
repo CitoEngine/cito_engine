@@ -27,3 +27,12 @@ class IncidentToggleForm(forms.Form):
     incident_id = forms.IntegerField()
     incident_status = forms.CharField(max_length=15)
     redirect_to = forms.CharField()
+
+
+class ElementSearchForm(forms.Form):
+    search_term = forms.CharField(max_length=255, required=True, label='Element name')
+
+    def __init__(self, *args, **kwargs):
+        super(forms.Form, self).__init__(*args, **kwargs)
+        # change a widget attribute:
+        self.fields['search_term'].widget.attrs["placeholder"] = 'Element Name'

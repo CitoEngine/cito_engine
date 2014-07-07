@@ -160,3 +160,8 @@ try:
 except ImportError:
     print "settings/secret_key.py not found!"
     sys.exit(1)
+
+try:
+    from .ldap_auth import *
+except ImportError:
+    print "LDAP settings not found or mis-configured, CitEngine will use internal authentication"

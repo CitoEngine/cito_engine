@@ -82,9 +82,11 @@
                             <li role="presentation">
                                 <a href="/reports/topincidents" tabindex="-1" role="menuitem">Most frequent incidents</a>
                             </li>
+                            <li role="presentation">
+                                <a href="/reports/mostalerted/" tabindex="-1" role="menuitem">Most alerted elements/hosts</a>
+                            </li>
                         </ul>
                     </li>
-
                     <!--*****Drop Down Menu 4 ***** -->
                     <li class="dropdown">
                         <a id="drop5" class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
@@ -93,15 +95,17 @@
                         </a>
                         <ul id="menu1" class="dropdown-menu" aria-labelledby="drop5" role="menu">
                             <li role="presentation">
+                                <a href="/incidents/search/element/" tabindex="-1" role="menuitem">Search</a>
+                            </li>
+                            <li role="presentation">
                                 <a href="/tools/bulkupload/events/" tabindex="-1" role="menuitem">Add events in bulk</a>
                             </li>
                         </ul>
                     </li>
-
-
                 </ul>
 
             </div>
+
 
             <div class="btn-group pull-right" >
             {% if request.user.is_authenticated %}

@@ -52,7 +52,7 @@ class Plugin(models.Model):
     status = models.BooleanField(default=True)
 
     def __unicode__(self):
-        return unicode(self.name)
+        return unicode('%s -> %s' % (self.server.name, self.name))
 
 
 class Category(models.Model):
