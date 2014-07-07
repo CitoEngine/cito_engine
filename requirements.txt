@@ -1,6 +1,6 @@
 Django==1.6.5
 MySQL-python==1.2.3
-psycopg2===2.5.3
+psycopg2==2.5.3
 South==0.8.4
 Twisted==13.2.0
 Unipath==1.0
