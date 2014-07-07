@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from cito_engine.forms import events
@@ -71,7 +72,17 @@ def view_events(request):
 
     # Default page, no search
     else:
-        render_vars['events'] = Event.objects.all().order_by('id')
+        events_list = Event.objects.all().order_by('id')
+        # TODO: Convert 'Pages per result' into global and user setting
+        paginator = Paginator(events_list, 25)
+        try:
+            render_vars['events'] = paginator.page(request.GET.get('page'))
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            render_vars['events'] = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            render_vars['events'] = paginator.page(paginator.num_pages)
     return render_to_response('view_all_events.html', render_vars, context_instance=RequestContext(request))
 
 

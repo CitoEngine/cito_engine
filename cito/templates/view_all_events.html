@@ -58,6 +58,34 @@
                                     </tbody>
                  </table>
         </div>
+             <!-- Pagination start here -->
+                <div class="dataTables_paginate paging_bootstrap pagination">
+                    <ul>
+                        {% if events.has_previous %}
+                        <li class="prev">
+                            <a href="?page={{ events.previous_page_number }}">← Previous</a>
+                        </li>
+                        {% else %}
+                       <li class="prev disabled">
+                            <a href="#">← Previous</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="active">
+                            <a href="#">Page {{ events.number }} of {{ events.paginator.num_pages }}.</a>
+                        </li>
+
+                        {% if events.has_next %}
+                        <li class="next">
+                            <a href="?page={{ events.next_page_number }}">Next → </a>
+                        </li>
+                        {% else %}
+                        <li class="next disabled">
+                            <a href="#">Next → </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
     </div>
 
 </div>
