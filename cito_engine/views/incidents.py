@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 from datetime import datetime, timedelta
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template import RequestContext
@@ -60,6 +61,7 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
         render_vars['page_title'] += ' for %s' % team.name
         render_vars['stats'] = get_incident_stats(team_id)
         render_vars['redirect_to'] = '/incidents/view/%s/%s' % (team_id, incident_status)
+        render_vars['team'] = team
 
     incident_list = Incident.objects.filter(**query_params)
     # TODO: Convert 'Pages per result' into global and user setting
@@ -119,3 +121,21 @@ def toggle_incident_status(request):
 
         # Send the user back to incidents if form is invalid
         return redirect('/incidents/')
+
+
+@login_required(login_url='/login/')
+def view_element(request):
+    render_vars = dict()
+    if request.user.perms.access_level > 4:
+        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+    if request.method == "POST":
+        form = incidents.ElementSearchForm(request.POST)
+        if form.is_valid():
+            search_term = form.cleaned_data.get('search_term')
+            render_vars['search_term'] = search_term
+            render_vars['incidents'] = Incident.objects.filter(~Q(status__iexact='Cleared'),
+                                                               element__icontains=search_term)
+    else:
+        form = incidents.ElementSearchForm()
+    render_vars['search_form'] = form
+    return render_to_response('view_elements.html', render_vars, context_instance=RequestContext(request))
