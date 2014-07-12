@@ -46,11 +46,11 @@ def update_reports(incident):
 def get_report_all_incidents(days, event_id=None, team_id=None, severity=None):
     query = dict()
     time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
-    if team_id:
+    if team_id is not None:
         query['team_id'] = team_id
-    if event_id:
+    if event_id is not None:
         query['event_id'] = event_id
-    if severity != 'All':
+    if severity != 'All' and severity is not None:
         query['severity'] = severity
     if days == 1:
         query['hour__gte'] = time_range
