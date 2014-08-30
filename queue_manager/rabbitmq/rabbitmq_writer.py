@@ -22,7 +22,13 @@ import logging
 
 logger = logging.getLogger('listener_logger')
 
+
 def send_to_rabbitmq(message):
+    """
+    Connects to rabbitmq and sends the json messsage to the queue
+    :param message:
+    :return:
+    """
     credentials = pika.PlainCredentials(settings.RABBITMQ_CONF['username'], settings.RABBITMQ_CONF['password'])
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -37,15 +43,15 @@ def send_to_rabbitmq(message):
 
     try:
         channel = connection.channel()
-    except:
-        logger.error('Error selecting channel')
-        return
+    except Exception as e:
+        logger.error('Error selecting channel, reason: %e')
+        return False
 
     try:
         channel.queue_declare(queue=settings.RABBITMQ_CONF['queue'], durable=True)
-    except:
-        logger.error('Error declaring queue: %s' % settings.RABBITMQ_CONF['queue'])
-        return
+    except Exception as e:
+        logger.error('Error declaring queue: %s, reason: %s' % (settings.RABBITMQ_CONF['queue'], e))
+        return False
 
     try:
         channel.basic_publish(exchange=settings.RABBITMQ_CONF['exchange'],
@@ -54,10 +60,19 @@ def send_to_rabbitmq(message):
                               properties=pika.BasicProperties(
                                   delivery_mode=2, # make message persistent
                               ),)
-    except:
-        logger.error('Error publishing message to EXCHANGE: %s, QUEUE:%s' %
-                     (settings.RABBITMQ_CONF['exchange'], settings.RABBITMQ_CONF['queue']))
-        return
-    else:
-        logger.debug('Message: %s' % message)
-        logger.info('Successfully wrote message')
+    except Exception as e:
+        logger.error('Error publishing message to EXCHANGE: %s, QUEUE:%s, reason: %s' %
+                     (settings.RABBITMQ_CONF['exchange'], settings.RABBITMQ_CONF['queue'], e))
+        return False
+
+    logger.debug('Message: %s' % message)
+    logger.info('Successfully wrote message')
+
+    #close the connection
+    try:
+        if connection.is_open:
+            connection.close()
+    except Exception as e:
+        logger.error('Cannot close connection, reason: %s' % e)
+
+    return True
