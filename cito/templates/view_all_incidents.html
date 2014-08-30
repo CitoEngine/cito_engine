@@ -56,6 +56,9 @@
 									  <th>Count</th>
 									  <th>Category</th>
 									  <th>Team</th>
+                                      {% if incident_status != 'active' %}
+									  <th>Assignee</th>
+                                      {% endif %}
                                       <th>&nbsp;</th>
 								  </tr>
 							  </thead>
@@ -74,9 +77,19 @@
                                     <td>{{ i.total_incidents }}</td>
                                     <td>{{ i.event.category }}</td>
                                     <td>{{ i.event.team }}</td>
+
+                                    {% if incident_status != 'active' %}
+                                     <td>
+                                        {% if i.status == 'Active' %}
+                                            None
+                                        {% elif i.status == 'Acknowledged' %}
+                                           <a href="/users/view/{{ i.acknowledged_by.id }}/">{{ i.acknowledged_by }} </a>
+                                        {% else %}
+                                             <a href="/users/view/{{ i.closed_by.id }}/">{{ i.closed_by }}</a>
+                                        {% endif %}
+                                    </td>
+                                    {% endif %}
                                     <td>
-
-
                                         {% if i.status == 'Active' %}
                                             <input type="button" class="btn btn-info btn-small" value="Ack" name="toggle_submit" onclick="javascript:toggle_status('Acknowledged', {{ i.id }});">
                                             <input type="button" class="btn btn-success btn-small" value="Clear" name="toggle_submit" onclick="javascript:toggle_status('Cleared', {{ i.id }});">
