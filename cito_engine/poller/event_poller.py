@@ -36,34 +36,48 @@ class EventPoller(object):
         self.queue_reader = None
 
     def parse_message(self, message):
+        """
+        Parses a message body and returns True if message should be deleted from queeu
+        :param message:
+        :return boolena: True if message can be deleted from queue, else False
+        """
         e = []
         # decode JSON
         try:
             parsed_json = simplejson.loads(message)
         except Exception as exception:
             logger.error('Error parsing JSON %s' % exception)
-            return False
+            return True
+
         for k in self.message_format:
             if not k in parsed_json:
                 logger.error('MessageTag %s not defined in  message:%s' %
                              (k, parsed_json))
-                return False
+                return True
+
         e = parsed_json['event']
         for k in self.event_format:
             if not k in e:
                 logger.error('EventTag %s not defined in  message:%s' %
                              (k, parsed_json))
-                return False
+                return True
 
         # Make sure we received a valid timestamp
         try:
             timestamp = int(parsed_json['timestamp'])
-        except:
-            logger.error('Invalid timestamp in message:%s' % message)
-            return False
+        except Exception as exp:
+            logger.error('Invalid timestamp in message:%s, reason:%s' % (message, exp))
+            return True
 
         # Add incident to Database
-        incident = add_incident(e, timestamp)
+        # This try/except block will catch
+        # django.db.utils.OperationalError: (2006, 'MySQL server has gone away')
+        # for a very low traffic server
+        try:
+            incident = add_incident(e, timestamp)
+        except Exception as exp:
+            logger.error('Could not add incident:%s, reason:%s' % (e, exp))
+            return False
 
         # Check incident thresholds and fire events
         if incident and incident.status == 'Active':
@@ -79,13 +93,15 @@ class EventPoller(object):
                     (settings.POLLER_CONFIG['batchsize'], settings.POLLER_CONFIG['interval']))
         for m in self.queue_reader.get_message_batch():
             logger.debug("Received: %s with ID:%s" % (m.get_body(), m.id))
-            if not self.parse_message(m.get_body()):
-                logger.error('MsgID:%s will not be written' % m.id)
 
-            try:
-                d = threads.deferToThread(self.queue_reader.delete_message, m)
-            except Exception as e:
-                logger.error("Error deleting msg from SQS: %s" % e)
+            if not self.parse_message(m.get_body()):
+                logger.error('MsgID:%s could not be written, will retry again.' % m.id)
+            else:
+                try:
+                    d = threads.deferToThread(self.queue_reader.delete_message, m)
+                    logger.debug('MsgID:%s deleted from queue' % m.id)
+                except Exception as exp:
+                    logger.error("Error deleting msg from SQS: %s" % exp)
 
     def _get_rabbitmq_messages(self):
         logger.info("-= RABBITMQ Poller run: BATCHSIZE=%s, POLLING_INTERVAL=%s =-" %
@@ -97,12 +113,15 @@ class EventPoller(object):
                 message_frame, message_body = self.queue_reader.get_message()
                 if not message_frame:
                     raise StopIteration()
+
                 if not self.parse_message(message_body):
-                    logger.error('MsgID:%s could not be written' % message_frame.delivery_tag)
-                try:
-                    d = threads.deferToThread(self.queue_reader.delete_message, message_frame)
-                except:
-                    pass
+                    logger.error('MsgID:%s could not be written, will retry again.' % message_frame.delivery_tag)
+                else:
+                    try:
+                        d = threads.deferToThread(self.queue_reader.delete_message, message_frame)
+                        logger.debug('MsgID:%s deleted from queue' % message_frame.delivery_tag)
+                    except Exception as exp:
+                        logger.error("Error deleting msg from RabbitMQ: %s" % exp)
         except StopIteration:
             pass
 
