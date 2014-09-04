@@ -15,6 +15,7 @@ limitations under the License.
 
 import logging
 import pika
+import sys
 from django.conf import settings
 
 logger = logging.getLogger('poller_logger')
@@ -80,9 +81,13 @@ class RabbitMQReader(object):
         Fetches a single message from rabbitmq
         :return:
         """
+        connected = False
 
         if self.connection is None:
-            self._connect_mq()
+            connected = self._connect_mq()
+
+        if not connected:
+            return None, None
 
         if not self.connection.is_open:
             self._connect_mq()

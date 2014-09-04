@@ -131,7 +131,10 @@ class EventPoller(object):
             self._get_sqs_messages()
         elif settings.QUEUE_TYPE in ['RABBITMQ', 'rabbitmq']:
             self.queue_reader = rabbitmq_reader.RabbitMQReader()
-            self._get_rabbitmq_messages()
+            try:
+                self._get_rabbitmq_messages()
+            except Exception as e:
+                logger.fatal('Could not fetch messages from RabbitMQ reason:%s' % e)
         else:
             raise ValueError('Incorrect value "%s" for QUEUE_TYPE in %s' %
                              (settings.QUEUE_TYPE, settings.SETTINGS_MODULE))
