@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.forms import Form, ChoiceField, IntegerField, BooleanField
+from django.forms import Form, ChoiceField, IntegerField, BooleanField, CharField
 from cito_engine.models import Team
 
 
@@ -91,3 +91,21 @@ class MostAlertedElements(Form):
 
     timerange = ChoiceField(choices=time_choices, label="Range")
     result_limit = ChoiceField(choices=result_limit_choices, label="Results")
+
+
+class IncidentsPerElement(Form):
+    time_choices = (
+        ('1', 'Last 24hours'),
+        ('7', 'Last week'),
+        ('30', '4 weeks'),
+    )
+    result_limit_choices = (
+        ('10', '10'),
+        ('25', '25'),
+        ('50', '50'),
+        ('100', '100'),
+    )
+
+    timerange = ChoiceField(choices=time_choices, label="Range (days)")
+    result_limit = ChoiceField(choices=result_limit_choices, label="Results")
+    element = CharField(label="Element/Hostname")

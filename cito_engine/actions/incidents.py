@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.db.models import Q
 import logging
 import requests
+import gevent
 from cito_engine.models import Event, EventAction, EventActionCounter, EventActionLog, Incident, IncidentLog
 from reports.actions import update_reports
 from . import json_formatter
@@ -34,7 +35,7 @@ class ProcessIncident(object):
     def begin(self):
         for event_action in EventAction.objects.filter(event=self.incident.event, isEnabled=True):
             if self.check_incident_threshold(event_action):
-                self.execute_plugin(event_action)
+                gevent.spawn(self.execute_plugin, event_action)
 
     def check_incident_threshold(self, event_action):
         """

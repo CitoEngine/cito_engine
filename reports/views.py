@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from cito_engine.models import Team, Event
 from . import actions
-from .forms import AllIncidentsReportForm, EventsPerTeam, MostAlertedElements
+from .forms import AllIncidentsReportForm, EventsPerTeam, MostAlertedElements, IncidentsPerElement
 
 @login_required(login_url='/login/')
 def report_all_incidents(request):
@@ -147,3 +147,23 @@ def report_most_alerted_elements(request):
             render_vars['elements_by_incidents'] = actions.get_most_alerted_elements(days, result_limit)
     return render_to_response('reports_most_alerted_elements.html', render_vars,
                               context_instance=RequestContext(request))
+
+
+def report_incidents_per_element(request):
+    render_vars = dict()
+    render_vars['page_title'] = 'Incidents per Element / Hostname'
+    render_vars['form'] = IncidentsPerElement()
+    if request.method == 'POST':
+        form = IncidentsPerElement(request.POST)
+        render_vars['form'] = form
+        if form.is_valid():
+            days = int(form.cleaned_data.get('timerange'))
+            result_limit = form.cleaned_data.get('result_limit')
+            element = form.cleaned_data.get('element')
+            render_vars['element'] = element
+            render_vars['days'] = days
+            render_vars['incidents'] = actions.get_incidents_for_element(days=days,
+                                                                         element=element,
+                                                                         result_limit=result_limit)
+    return render_to_response('reports_incidents_per_element.html',
+                              render_vars, context_instance=RequestContext(request))
