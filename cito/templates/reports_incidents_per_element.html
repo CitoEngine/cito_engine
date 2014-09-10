@@ -19,44 +19,47 @@
         </div>
     </div>
 
+    {% if element %}
     <div class="box span12">
         <div class="box-content">
          <div class="box-header well">
-            <h2>Top elements based on number of incidents</h2>
+            <h2>There were {{ incidents.count }} unique incidents for {{ element }} in last {{ days }} day(s)</h2>
         </div>
             <table id="sortable-table" class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
                          <thead>
 								  <tr>
                                       <th>Element</th>
-									  <th>Unique incidents</th>
-									  <th>Total incidents</th>
+									  <th>Event ID</th>
+									  <th>Incident ID</th>
+									  <th>Severity</th>
+									  <th>Category</th>
+									  <th>Incident Time</th>
+									  <th>Worked by</th>
+									  <th>Team</th>
+									  <th>Status</th>
 								  </tr>
                           </thead>
                           <tbody>
-                                {% for i in elements_by_incidents %}
+                                {% for i in incidents %}
                                     <tr>
-                                    <td><a href="#" onclick="search_element_form('{{ i.element }}');">{{ i.element }}</a></td>
-                                    <td><a href="#" onclick="search_element_form('{{ i.element }}');">{{ i.uniq_count}}</a></td>
-                                    <td>{{ i.total_count}}</td>
+                                    <td>{{ i.element }}</td>
+                                    <td>[<a href="/events/view/{{ i.event.id }}">{{ i.event.id }}</a>] {{ i.event.summary }}</td>
+                                    <td><a href="/incidents/view/{{ i.id }}/">{{ i.id }}</a></td>
+                                    <td>{{ i.event.severity }}</td>
+                                    <td>{{ i.event.category }}</td>
+                                    <td>{{ i.firstEventTime }}</td>
+                                    <td>{{ i.closed_by}}</td>
+                                    <td>{{ i.event.team }}</td>
+                                    <td>{{ i.status}}</td>
+
                                     </tr>
                                 {% endfor %}
                          </tbody>
             </table>
         </div>
     </div>
-
+    {% endif %}
 
 </div> <!-- container -->
-<script type="text/javascript">
-                function search_element_form(search_term){
-                    console.log(search_term)
-                                        $('[name=element]').val(search_term);
-                                        $('#search_element').submit();
-                                    }
-</script>
-<form method="post" id="search_element" action="/reports/elements/incidents/" accept-charset="."> {% csrf_token %}
-                                    <input type="hidden" name="element" value="">
-                                    <input type="hidden" name="result_limit" value="25">
-                                    <input type="hidden" name="timerange" value="7">
-                                </form>
+
 {% include 'footer.html' %}

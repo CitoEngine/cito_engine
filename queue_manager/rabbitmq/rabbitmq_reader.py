@@ -15,6 +15,7 @@ limitations under the License.
 
 import logging
 import pika
+import sys
 from django.conf import settings
 
 logger = logging.getLogger('poller_logger')
@@ -27,6 +28,10 @@ class RabbitMQReader(object):
         self.connection = None
 
     def _connect_mq(self):
+        """
+        Connects to rabbitmq and selects the channel
+        :return:
+        """
         logger.info('Connecting to rabbitmq server..')
         try:
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -35,32 +40,68 @@ class RabbitMQReader(object):
                 credentials=self.credentials,
                 virtual_host=settings.RABBITMQ_CONF['vhost'],
                 ssl=settings.RABBITMQ_CONF['ssl']))
-        except pika.exceptions.AMQPConnectionError:
-            logger.error('Error connecting to RabbitMQ server: %s' % settings.RABBITMQ_CONF['host'])
+        except pika.exceptions.AMQPConnectionError as e:
+            logger.error('Error connecting to RabbitMQ server: %s, reason: %s' % (settings.RABBITMQ_CONF['host'], e))
             return False
 
         try:
             self.channel = self.connection.channel()
-        except:
-            logger.error('Error selecting channel')
+        except Exception as e:
+            logger.error('Error selecting channel, reason: %e')
             return False
 
         try:
             self.channel.queue_declare(queue=settings.RABBITMQ_CONF['queue'], durable=True)
-        except:
-            logger.error('Error declaring queue: %s' % settings.RABBITMQ_CONF['queue'])
+        except Exception as e:
+            logger.error('Error declaring queue: %s, reason: %s' % (settings.RABBITMQ_CONF['queue'], e))
             return False
 
         return True
 
+    def _close_mq(self):
+        """
+        Closes connection to rabbitmq
+        :return:
+        """
+        logger.info('Closing connection to rabbitmq')
+        # if self.channel.is_open:
+        #     try:
+        #         self.channel.close()
+        #     except Exception as e:
+        #         logger.error('Error closing channel, reason: %s' % e)
+
+        if self.connection.is_open:
+            try:
+                self.connection.close()
+            except Exception as e:
+                logger.error('Error closing connection, reason: %s' % e)
+
     def get_message(self):
-        if not self.connection:
+        """
+        Fetches a single message from rabbitmq
+        :return:
+        """
+        connected = False
+
+        if self.connection is None:
+            connected = self._connect_mq()
+
+        if not connected:
+            return None, None
+
+        if not self.connection.is_open:
             self._connect_mq()
+        else:
+            logger.debug('Already connected..')
+
         try:
             method_frame, header_frame, body = self.channel.basic_get(settings.RABBITMQ_CONF['queue'], no_ack=False)
-        except:
+        except Exception as e:
+            logger.error('Error fetching message from rabbitmq, reason: %s' % e)
             # Send an empty tuple if channel.basic_get failed for some reason.
             return None, None
+
+        # self._close_mq()
 
         if method_frame:
             return method_frame, body
@@ -68,7 +109,19 @@ class RabbitMQReader(object):
             # Send an empty tuple if channel.basic_get did not return a message
             return None, None
 
+
     def delete_message(self, method_frame):
+        """
+        Deletes the message from queue
+        :param method_frame:
+        :return:
+        """
+        if self.connection is None or self.channel is None:
+            self._connect_mq()
+
+        if not self.connection.is_open or self.channel.is_closed:
+            self._connect_mq()
+
         try:
             self.channel.basic_ack(method_frame.delivery_tag)
         except AttributeError:

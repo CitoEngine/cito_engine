@@ -50,6 +50,7 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
     query_params = dict()
     render_vars = dict()
     render_vars['page_title'] = 'Viewing %s incidents' % incident_status
+    render_vars['incident_status'] = incident_status
     query_params['status__iexact'] = incident_status
 
     if not team_id:

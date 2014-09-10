@@ -46,11 +46,11 @@ def update_reports(incident):
 def get_report_all_incidents(days, event_id=None, team_id=None, severity=None):
     query = dict()
     time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
-    if team_id:
+    if team_id is not None:
         query['team_id'] = team_id
-    if event_id:
+    if event_id is not None:
         query['event_id'] = event_id
-    if severity != 'All':
+    if severity != 'All' and severity is not None:
         query['severity'] = severity
     if days == 1:
         query['hour__gte'] = time_range
@@ -133,3 +133,15 @@ def get_most_alerted_elements(days, result_limit=10):
                                        annotate(uniq_count=Count('id'), total_count=Sum('total_incidents')). \
                                        order_by('-uniq_count')[:result_limit]
     return elements_by_unique_incidents
+
+
+def get_incidents_for_element(days, element, result_limit=10):
+    """
+    Fetch incidents for an element
+    :param days:
+    :param result_limit:
+    :return:
+    """
+    time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
+    incidents = Incident.objects.filter(element__exact=element, firstEventTime__gte=time_range)[:result_limit]
+    return incidents

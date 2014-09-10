@@ -19,7 +19,7 @@
     {% if search_term %}
     <div class="box ">
     <div class="box-header well">
-        <h2><i class="icon-info-sign"></i>{{ page_title }}</h2>
+        <h2><i class="icon-info-sign"></i>There are {{ incidents.count }} active/acknowledged incident(s) for elements matching: {{ search_term }}</h2>
     </div>
     <div class="box-content">
                 <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
@@ -34,6 +34,7 @@
 									  <th>Count</th>
 									  <th>Category</th>
 									  <th>Team</th>
+									  <th>Assignee</th>
                                       <th>&nbsp;</th>
 								  </tr>
 							  </thead>
@@ -55,6 +56,7 @@
                                     <td>{{ i.total_incidents }}</td>
                                     <td>{{ i.event.category }}</td>
                                     <td>{{ i.event.team }}</td>
+                                    <td>{{ i.acknowledged_by }}</td>
                                     <td>
 
 
@@ -87,6 +89,17 @@
     {% endif %}
 
 </div>
+
+<div class="box">
+        <div class="box-content">
+            <form class="form-horizontal" method="POST" accept-charset="." action="/reports/elements/incidents/"> {% csrf_token %}
+            <input type="hidden" name="element" value="{{ search_term }}">
+            <input type="hidden" name="timerange" value="7">
+            <input type="hidden" name="result_limit" value="25">
+            <button type="submit" class="btn btn-primary btn-small">Click here to view past alerts for {{ search_term }}</button>
+            </form>
+        </div>
+    </div>
 {% include 'footer.html' %}
 
 
