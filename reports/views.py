@@ -137,7 +137,7 @@ def report_incidents_per_event(request):
 def report_most_alerted_elements(request):
     render_vars = dict()
     render_vars['form'] = MostAlertedElements()
-    render_vars['page_title'] = 'Most alerted element'
+    render_vars['page_title'] = 'Most alerted elements'
     if request.method == 'POST':
         form = MostAlertedElements(request.POST)
         render_vars['form'] = form

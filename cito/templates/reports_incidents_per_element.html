@@ -30,6 +30,7 @@
 								  <tr>
                                       <th>Element</th>
 									  <th>Event ID</th>
+									  <th>Incident ID</th>
 									  <th>Severity</th>
 									  <th>Category</th>
 									  <th>Incident Time</th>
@@ -43,6 +44,7 @@
                                     <tr>
                                     <td>{{ i.element }}</td>
                                     <td>[<a href="/events/view/{{ i.event.id }}">{{ i.event.id }}</a>] {{ i.event.summary }}</td>
+                                    <td><a href="/incidents/view/{{ i.id }}/">{{ i.id }}</a></td>
                                     <td>{{ i.event.severity }}</td>
                                     <td>{{ i.event.category }}</td>
                                     <td>{{ i.firstEventTime }}</td>
