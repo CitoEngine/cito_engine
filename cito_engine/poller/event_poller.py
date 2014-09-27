@@ -12,12 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-
+from datetime import datetime
+import gevent
 import logging
 import simplejson
-from twisted.internet import task, reactor, threads
+import time
+from gevent.threadpool import ThreadPool
 from django.conf import settings
+from django.db import connection
 from cito_engine.actions.incidents import add_incident, ProcessIncident
 from queue_manager.sqs import sqs_reader
 from queue_manager.rabbitmq import rabbitmq_reader
@@ -81,7 +83,7 @@ class EventPoller(object):
 
         # Check incident thresholds and fire events
         if incident and incident.status == 'Active':
-            threads.deferToThread(ProcessIncident, incident, e['message'])
+            gevent.spawn(ProcessIncident, incident, e['message'])
         logger.info('MsgOk: EventID:%s, Element:%s, Message:%s on Timestamp:%s' % (e['eventid'],
                                                                                    e['element'],
                                                                                    e['message'],
@@ -91,56 +93,63 @@ class EventPoller(object):
     def _get_sqs_messages(self):
         logger.info("-= SQS Poller run: BATCHSIZE=%s, POLLING_INTERVAL=%s =-" %
                     (settings.POLLER_CONFIG['batchsize'], settings.POLLER_CONFIG['interval']))
-        for m in self.queue_reader.get_message_batch():
+        queue_reader = sqs_reader.SQSReader()
+        for m in queue_reader.get_message_batch():
             logger.debug("Received: %s with ID:%s" % (m.get_body(), m.id))
 
             if not self.parse_message(m.get_body()):
                 logger.error('MsgID:%s could not be written, will retry again.' % m.id)
             else:
                 try:
-                    d = threads.deferToThread(self.queue_reader.delete_message, m)
+                    gevent.spawn(queue_reader.delete_message, m)
+                    gevent.sleep(0)
                     logger.debug('MsgID:%s deleted from queue' % m.id)
                 except Exception as exp:
                     logger.error("Error deleting msg from SQS: %s" % exp)
+        connection.close()
 
-    def _get_rabbitmq_messages(self):
-        logger.info("-= RABBITMQ Poller run: BATCHSIZE=%s, POLLING_INTERVAL=%s =-" %
-                    (settings.POLLER_CONFIG['batchsize'], settings.POLLER_CONFIG['interval']))
-
-        # Emulate batch messages by polling rabbitmq server multiple times
+    def _get_rabbitmq_messages(self, i):
+        queue_reader = rabbitmq_reader.RabbitMQReader()
         try:
-            for i in range(settings.POLLER_CONFIG['batchsize']):
-                message_frame, message_body = self.queue_reader.get_message()
-                if not message_frame:
-                    raise StopIteration()
+            message_frame, message_body = queue_reader.get_message()
+            if not message_frame:
+                raise StopIteration()
 
-                if not self.parse_message(message_body):
-                    logger.error('MsgID:%s could not be written, will retry again.' % message_frame.delivery_tag)
-                else:
-                    try:
-                        d = threads.deferToThread(self.queue_reader.delete_message, message_frame)
-                        logger.debug('MsgID:%s deleted from queue' % message_frame.delivery_tag)
-                    except Exception as exp:
-                        logger.error("Error deleting msg from RabbitMQ: %s" % exp)
+            if not self.parse_message(message_body):
+                logger.error('MsgID:%s could not be written, will retry again.' % message_frame.delivery_tag)
+            else:
+                try:
+                    gevent.spawn(queue_reader.delete_message, message_frame)
+                    gevent.sleep(0)
+                except Exception as exp:
+                    logger.error("Error deleting msg from RabbitMQ: %s" % exp)
         except StopIteration:
             pass
+        connection.close()
 
     def _get_messages(self):
-        if settings.QUEUE_TYPE in ['SQS', 'sqs']:
-            self.queue_reader = sqs_reader.SQSReader()
-            self._get_sqs_messages()
-        elif settings.QUEUE_TYPE in ['RABBITMQ', 'rabbitmq']:
-            self.queue_reader = rabbitmq_reader.RabbitMQReader()
-            try:
-                self._get_rabbitmq_messages()
-            except Exception as e:
-                logger.fatal('Could not fetch messages from RabbitMQ reason:%s' % e)
-        else:
-            raise ValueError('Incorrect value "%s" for QUEUE_TYPE in %s' %
-                             (settings.QUEUE_TYPE, settings.SETTINGS_MODULE))
+        # Emulate batch messages by polling rabbitmq server multiple times
+        pool = ThreadPool(settings.POLLER_CONFIG['batchsize'])
+        for i in range(settings.POLLER_CONFIG['batchsize']):
+            if settings.QUEUE_TYPE in ['SQS', 'sqs']:
+                pool.spawn(self._get_sqs_messages)
+            elif settings.QUEUE_TYPE in ['RABBITMQ', 'rabbitmq']:
+                pool.spawn(self._get_rabbitmq_messages,i)
+            else:
+                raise ValueError('Incorrect value "%s" for QUEUE_TYPE in %s' %
+                                 (settings.QUEUE_TYPE, settings.SETTINGS_MODULE))
 
     def begin_event_poller(self):
-        logger.info("-=         Event Poller starting         =-")
-        task_loop = task.LoopingCall(self._get_messages)
-        task_loop.start(self.poll_interval)
-        reactor.run()
+        logger.info('-=         Event Poller starting         =-')
+        logger.info('-=            Batch Size: %s             =-' % settings.POLLER_CONFIG['batchsize'])
+        while True:
+            start_time = int(datetime.utcnow().strftime('%s'))
+            logger.info('Checking for incidents in %s' % settings.QUEUE_TYPE)
+            self._get_messages()
+            end_time = int(datetime.utcnow().strftime('%s'))
+            run_time = end_time - start_time
+            logger.debug('Poller run completed in %s seconds' % run_time)
+
+            if run_time < self.poll_interval:
+                logger.info('Sleeping for %s sec(s)' % self.poll_interval)
+                time.sleep(self.poll_interval)

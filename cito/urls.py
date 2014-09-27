@@ -19,13 +19,12 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
-from cito_engine.api import IncidentResource
+from api.incident_listener import IncidentListenerAPI
 admin.autodiscover()
 
 urlpatterns = patterns('',
                        url(r'^$', 'cito_engine.views.incidents.view_all_incidents'),
                        url(r'^admin/', include(admin.site.urls)),
-                       url(r'^api/', include(IncidentResource().urls)),
                        url(r'^events/add/$', 'cito_engine.views.events.add_event'),
                        url(r'^events/view/$', 'cito_engine.views.events.view_events'),
                        url(r'^events/$', 'cito_engine.views.events.view_events'),
@@ -77,6 +76,12 @@ urlpatterns += patterns('',
                         url(r'^dashboard/$', 'cito_engine.views.dashboards.teamview'),
                         )
 
+#TODO: Remove addevent before releasing v1.0
+urlpatterns += patterns('',
+                        url(r'^addevent/$', IncidentListenerAPI.as_view()),
+                        url(r'^api/incidents/add/$', IncidentListenerAPI.as_view()),
+                        )
+
 urlpatterns += patterns('',
                         url(r'^reports/$', 'reports.views.report_all_incidents'),
                         url(r'^reports/allincidents/$', 'reports.views.report_all_incidents'),
@@ -85,6 +90,9 @@ urlpatterns += patterns('',
                         url(r'^reports/mostalerted/$', 'reports.views.report_most_alerted_elements'),
                         url(r'^reports/elements/incidents/$', 'reports.views.report_incidents_per_element'),
                         )
+
+
+
 
 # urlpatterns += staticfiles_urlpatterns()
 

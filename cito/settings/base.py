@@ -155,6 +155,8 @@ INSTALLED_APPS = (
 
 STATIC_FILES = PROJECT_ROOT.ancestor(1).child('staticfiles')
 
+INCIDENT_PARAMS = ['event', 'timestamp']
+
 try:
     from .secret_key import *
 except ImportError:
