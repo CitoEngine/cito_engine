@@ -104,7 +104,7 @@ def add_incident(e, timestamp):
     except Incident.MultipleObjectsReturned:
         # If there are multiple open incidents for same eventID and element
         # we close them.
-        print "Multiple open objects found for %s " % element
+        logger.error('Multiple open objects found for %s ' % element)
         close_duplicate_incidents(event, element)
         return
     except Incident.DoesNotExist:
