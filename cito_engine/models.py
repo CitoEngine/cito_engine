@@ -28,18 +28,18 @@ class PluginServer(models.Model):
     def __unicode__(self):
         return unicode(self.name)
 
-    def _count_active_plugins(self):
+    @property
+    def activePlugins(self):
         return Plugin.objects.filter(server=self, status=True).count()
 
-    def _count_inactive_plugins(self):
+    @property
+    def inactivePlugins(self):
         return Plugin.objects.filter(server=self, status=False).count()
 
-    def _get_all_plugins(self):
+    @property
+    def plugins(self):
         return Plugin.objects.filter(server=self)
 
-    activePlugins = property(_count_active_plugins)
-    inactivePlugins = property(_count_inactive_plugins)
-    plugins = property(_get_all_plugins)
     ssl_verify = models.BooleanField(default=True)
 
 
@@ -115,16 +115,16 @@ class Incident(models.Model):
     def __unicode__(self):
         return unicode('%s:%s:%s' % (self.event.id, self.element, self.status))
 
-    def _get_incident_info(self):
+    @property
+    def incidentInfo(self):
         return u'EventID:%s,Element:%s' % (self.event.id, self.element)
-    incidentInfo = property(_get_incident_info)
 
-    def _is_open(self):
+    @property
+    def is_open(self):
         if self.status != 'Cleared':
             return True
         else:
             return False
-    is_open = property(_is_open)
 
     def increment_count(self):
         self.total_incidents += 1
