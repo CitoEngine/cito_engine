@@ -42,7 +42,7 @@ class ProcessIncident(object):
         """
         event_action_counter, create = EventActionCounter.objects.get_or_create(incident=self.incident,
                                                                                 event_action=event_action)
-        return event_action_counter.check_threshold()
+        return event_action_counter.is_action_required
 
     def execute_plugin(self, event_action):
         """
@@ -131,7 +131,6 @@ def add_incident(e, timestamp):
 
     # Update counters
     i.increment_count()
-    i.save()
     update_eventaction_counters(i, incident_time_diff)
 
     # Add incident to log

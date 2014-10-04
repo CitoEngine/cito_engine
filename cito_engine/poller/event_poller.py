@@ -37,6 +37,7 @@ class EventPoller(object):
         self.poll_interval = settings.POLLER_CONFIG['interval']
         self.queue_reader = None
 
+    #TODO move parser to a out of event poller
     def parse_message(self, message):
         """
         Parses a message body and returns True if message should be deleted from queeu
@@ -84,6 +85,7 @@ class EventPoller(object):
         # Check incident thresholds and fire events
         if incident and incident.status == 'Active':
             gevent.spawn(ProcessIncident, incident, e['message'])
+            gevent.sleep(0)
         logger.info('MsgOk: EventID:%s, Element:%s, Message:%s on Timestamp:%s' % (e['eventid'],
                                                                                    e['element'],
                                                                                    e['message'],

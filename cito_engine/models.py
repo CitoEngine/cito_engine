@@ -128,6 +128,7 @@ class Incident(models.Model):
 
     def increment_count(self):
         self.total_incidents += 1
+        self.save()
 
     def toggle_status(self, status, user, time):
         if self.status != 'Cleared' and status in ['Acknowledged', 'Cleared']:
@@ -138,6 +139,10 @@ class Incident(models.Model):
             elif status == 'Cleared':
                 self.closed_by = user
                 self.close_time = time
+                # delete counters
+                for counter in EventActionCounter.objects.filter(incident=self):
+                    counter.delete()
+        self.save()
         return
 
 
@@ -171,10 +176,39 @@ class EventActionCounter(models.Model):
     event_action = models.ForeignKey(EventAction)
     count = models.IntegerField(default=1)
     timer = models.IntegerField(default=0)
+    is_triggered = models.BooleanField(default=False)
 
-    def _reset(self):
-        self.count = 0
+    def update_counters(self, timer_value):
+        """
+        Updates timer (in seconds) upon each call but updates the counter until the threshold is met
+        :param timer_value:
+        """
+        if self.count < self.event_action.threshold_count:
+            self.count += 1
+        self.timer += timer_value
+        self.save()
+
+    @property
+    def is_action_required(self):
+        # Check if X incidents occured in Y seconds
+        if self.count >= self.event_action.threshold_count and self.timer <= self.event_action.threshold_timer:
+            if not self.is_triggered:
+                self.is_triggered = True
+                self.save()
+                return True
+        # Got an incident outside the timer
+        elif self.timer > self.event_action.threshold_timer:
+            # If threshold was one incident in Y secs, we have to return True
+            self._reset_all()
+            if self.event_action.threshold_count == 1:
+                return True
+
+        return False
+
+    def _reset_all(self):
+        self.count = 1
         self.timer = 0
+        self.is_triggered = False
         self.save()
 
     def check_threshold(self):
@@ -186,12 +220,6 @@ class EventActionCounter(models.Model):
             return True
         else:
             return False
-
-    def increment_timer(self, value):
-        self.timer += value
-
-    def increment_count(self):
-        self.count += 1
 
     def __unicode__(self):
         return '%s:%s' % (self.incident.id, self.event_action.plugin)

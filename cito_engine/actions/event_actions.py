@@ -42,7 +42,7 @@ def dispatcher_dry_run(event, event_action):
 
 def update_eventaction_counters(incident, timer_value=0):
     try:
-        event_actions = EventAction.objects.filter(event=incident.event)
+        event_actions = EventAction.objects.filter(event=incident.event, isEnabled=True)
     except EventAction.DoesNotExist:
         return
 
@@ -50,7 +50,5 @@ def update_eventaction_counters(incident, timer_value=0):
         event_action_counter, create = EventActionCounter.objects.get_or_create(incident=incident,
                                                                                 event_action=event_action)
         if not create:
-            event_action_counter.increment_count()
-            event_action_counter.increment_timer(timer_value)
-        event_action_counter.save()
+            event_action_counter.update_counters(timer_value=timer_value)
     return
