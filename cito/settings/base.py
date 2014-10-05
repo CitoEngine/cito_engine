@@ -146,7 +146,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'south',
-    'tastypie',
     'cito_engine',
     'appauth',
     'reports',
