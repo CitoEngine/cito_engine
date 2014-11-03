@@ -14,12 +14,16 @@ limitations under the License.
 """
 
 from datetime import datetime
+import logging
+
 from django.utils import timezone
 from django.db.models import Q
-import logging
 import requests
+
 from cito_engine.models import Event, EventAction, EventActionCounter, EventActionLog, Incident, IncidentLog
 from reports.actions import update_reports
+from rules_engine.lib.suppressors import SuppressorPipeLine
+from audit.auditlog import incidentauditlog
 from . import json_formatter
 from .event_actions import update_eventaction_counters
 
@@ -32,9 +36,25 @@ class ProcessIncident(object):
         self.begin()
 
     def begin(self):
-        for event_action in EventAction.objects.filter(event=self.incident.event, isEnabled=True):
-            if self.check_incident_threshold(event_action):
-                self.execute_plugin(event_action)
+        """
+        If incident is suppressed, do nothing.
+        Else execute EventActions
+        """
+
+        # Log if incident is already suppressed
+        if self.incident.is_suppressed:
+            incidentauditlog(incident=self.incident, message='IncidentID:%s is suppressed' % self.incident.id)
+
+        # Check suppression pipeline
+        elif SuppressorPipeLine().is_suppressed(incident=self.incident):
+            self.incident.suppressed()
+            incidentauditlog(incident=self.incident, message='IncidentID:%s found in suppression pipline, it is now suppressed.' % self.incident.id)
+
+        # Process incident normally
+        else:
+            for event_action in EventAction.objects.filter(event=self.incident.event, isEnabled=True):
+                if self.check_incident_threshold(event_action):
+                    self.execute_plugin(event_action)
 
     def check_incident_threshold(self, event_action):
         """

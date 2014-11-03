@@ -30,6 +30,9 @@ def autoregister(*app_list):
 autoregister('cito_engine')
 autoregister('appauth')
 autoregister('reports')
+autoregister('comments')
+autoregister('rules_engine')
+autoregister('audit')
 
 
 

@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from api.incident_listener import IncidentListenerAPI
+from rules_engine.views import SuppressionSearchView, SuppressionAddView, RemoveSuppression
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -80,6 +81,12 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
                         url(r'^addevent/$', IncidentListenerAPI.as_view()),
                         url(r'^api/incidents/add/$', IncidentListenerAPI.as_view()),
+                        )
+
+urlpatterns += patterns('',
+                        url(r'^suppression/view/$', SuppressionSearchView.as_view()),
+                        url(r'^suppression/add/$', SuppressionAddView.as_view()),
+                        url(r'^suppression/remove/$', RemoveSuppression.as_view()),
                         )
 
 urlpatterns += patterns('',
