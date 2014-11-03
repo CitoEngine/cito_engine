@@ -150,6 +150,8 @@ INSTALLED_APPS = (
     'appauth',
     'reports',
     'comments',
+    'rules_engine',
+    'audit',
 )
 
 STATIC_FILES = PROJECT_ROOT.ancestor(1).child('staticfiles')
