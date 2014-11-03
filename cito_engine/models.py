@@ -111,6 +111,7 @@ class Incident(models.Model):
     acknowledged_by = models.ForeignKey(User, null=True, blank=True, default=None, related_name='+')
     closed_by = models.ForeignKey(User, null=True, blank=True, default=None, related_name='+')
     total_incidents = models.IntegerField(default=0)
+    is_suppressed = models.BooleanField(default=False)
 
     def __unicode__(self):
         return unicode('%s:%s:%s' % (self.event.id, self.element, self.status))
@@ -144,6 +145,12 @@ class Incident(models.Model):
                     counter.delete()
         self.save()
         return
+
+    def suppressed(self):
+        """ Incident suppression flag set true
+        """
+        self.is_suppressed = True
+        self.save()
 
 
 class IncidentLog(models.Model):
