@@ -25,7 +25,7 @@ logger = logging.getLogger('listener_logger')
 
 def send_to_rabbitmq(message):
     """
-    Connects to rabbitmq and sends the json messsage to the queue
+    Connects to rabbitmq and sends the json message to the queue
     :param message:
     :return:
     """
@@ -63,10 +63,11 @@ def send_to_rabbitmq(message):
     except Exception as e:
         logger.error('Error publishing message to EXCHANGE: %s, QUEUE:%s, reason: %s' %
                      (settings.RABBITMQ_CONF['exchange'], settings.RABBITMQ_CONF['queue'], e))
+        logger.error('Message received by RabbitMQ: %s' % message)
         return False
 
     logger.debug('Message: %s' % message)
-    logger.info('Successfully wrote message')
+    logger.info('Incident successfully written to RabbitMQ')
 
     #close the connection
     try:

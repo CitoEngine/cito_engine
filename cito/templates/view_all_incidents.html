@@ -54,6 +54,7 @@
 									  <th>First Occurence</th>
 									  <th>Last Occurence</th>
 									  <th>Count</th>
+									  <th>Suppressed?</th>
 									  <th>Category</th>
 									  <th>Team</th>
                                       {% if incident_status != 'active' %}
@@ -75,6 +76,7 @@
                                     <td>{{ i.firstEventTime|date:"M d, Y, H:i" }}</td>
                                     <td>{{ i.lastEventTime|date:"M d, Y, H:i"  }}</td>
                                     <td>{{ i.total_incidents }}</td>
+                                    <td>{% if i.is_suppressed %} Yes {% else %} No {% endif %}</td>
                                     <td>{{ i.event.category }}</td>
                                     <td>{{ i.event.team }}</td>
 

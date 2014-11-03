@@ -28,7 +28,6 @@ def add_comment(request):
         if form.is_valid():
             form.save()
         else:
-            print "Invalid form: %s " % form
             raise ValueError
 
         return redirect('/incidents/view/%s/' % form.cleaned_data.get('incident').id)

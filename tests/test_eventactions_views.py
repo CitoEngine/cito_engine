@@ -60,7 +60,6 @@ class TestEventActionViews(TestCase):
                 'threshold_timer': 60,
                 'pluginParameters': 'HODOR_RULES'}
         response = self.client.post(self.add_url, data, follow=True)
-        print response
 
         self.assertRedirects(response, '/events/view/%s/' % self.event.id)
         response = self.client.get('/events/view/%s/' % self.event.id)

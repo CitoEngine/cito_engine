@@ -13,14 +13,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
-from tastypie.resources import ModelResource
-from tastypie.serializers import Serializer
+from django.db import models
 from cito_engine.models import Incident
 
-class IncidentResource(ModelResource):
-    class Meta:
-        queryset = Incident.objects.all()
-        resource_name = 'incident'
-        serializer = Serializer(formats=['json'])
 
+class AuditLog(models.Model):
+    LOG_TYPE_CHOICES = (('info', 'info'),
+                        ('warn', 'warn'),
+                        ('error', 'error'),
+                        )
+    date_added = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+    level = models.CharField(choices=LOG_TYPE_CHOICES, default='info', max_length=5)
+
+
+class IncidentAuditLog(AuditLog):
+    incident = models.ForeignKey(Incident, db_index=True)
+
+    def __unicode__(self):
+        return '%s:%s:%s' % (self.date_added, self.level, self.message[:10])

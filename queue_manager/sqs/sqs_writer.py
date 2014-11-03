@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import logging
-from time import time
+from datetime import datetime
 import simplejson
 import boto.sqs
 from boto.sqs.message import Message
@@ -36,7 +36,7 @@ def send_to_sqs(msg):
 
     # wrap with timestamp
     if 'timestamp' not in parsed_json:
-        msg = '{"event":%s , "timestamp":"%d"}' % (msg, int(time()))
+        msg = '{"event":%s , "timestamp":"%d"}' % (msg, int(datetime.utcnow().strftime('%s')))
 
     logger.debug('Message %s' % msg)
 
@@ -56,5 +56,5 @@ def send_to_sqs(msg):
             logger.critical('Could not send this msg to queue: %s' % m.get_body())
             return False
         else:
-            logger.info('Wrote %s' % m.id)
+            logger.info('Incident successfully written to SQS, msg_id:%s' % m.id)
             return True

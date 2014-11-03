@@ -13,12 +13,90 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from time import time
+from mock import patch, call
 from django.test import TestCase
-from cito_engine.actions import event_actions
+from cito_engine.models import Incident, IncidentLog, EventActionCounter
+from cito_engine.poller.event_poller import EventPoller
 from . import factories
 
 
 class TestEventActions(TestCase):
-    def setUp(self):
-        self.incident = factories.IncidentFactory()
+    """
+    X = 2, Y=100
 
+     Case 1
+     * One incident in T secs
+     * 2nd at T+10, 3rd at T+11, 4th at T+51
+     * Assert we have 1 single incident, 4 logs and event action executed once
+
+     * 5th incident occurs at T+101
+     * Assert counters are reset
+     * 6th incident occurs at T+151
+     * Assert event action is executed for the second time
+
+    """
+    def setUp(self):
+        self.event = factories.EventFactory.create()
+        self.eventaction = factories.EventActionFactory.create(event=self.event,threshold_count=2, threshold_timer=100)
+
+    @patch('cito_engine.actions.incidents.requests')
+    def test__single_event_action_execution(self, mock_requests):
+        T = int(time())
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (self.event.id, T)
+
+        eventpoller = EventPoller()
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+        incident = Incident.objects.filter()[0]
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertFalse(eacounter.is_triggered)
+
+        # 2nd incident
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (
+            self.event.id, T+10)
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertTrue(eacounter.is_triggered)
+
+        #3rd incident
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (
+            self.event.id, T + 11)
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertTrue(eacounter.is_triggered)
+
+        # 4th incident
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (
+            self.event.id, T + 51)
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertTrue(eacounter.is_triggered)
+
+        #We should have one incident and 4 incident logs
+        self.assertEqual(Incident.objects.count(), 1)
+        self.assertEqual(IncidentLog.objects.count(), 4)
+
+        # Assert we only execute plugin once
+        self.assertEqual(mock_requests.post.call_count, 1)
+
+        # 5th incident after time window
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (
+            self.event.id, T + 101)
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertFalse(eacounter.is_triggered)
+        # Assert we did not execute plugin yet
+        self.assertEqual(mock_requests.post.call_count, 1)
+
+        # 6th incident after time window
+        raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (
+            self.event.id, T + 121)
+        self.assertTrue(eventpoller.parse_message(raw_incident))
+        eacounter = EventActionCounter.objects.get(incident=incident)
+        self.assertTrue(eacounter.is_triggered)
+        # Assert event action occurred for the second time
+        self.assertEqual(mock_requests.post.call_count, 2)
+
+
+        #todo create tests to check use cases mentioned in the comments

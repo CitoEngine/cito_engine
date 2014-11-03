@@ -32,7 +32,7 @@ class RabbitMQReader(object):
         Connects to rabbitmq and selects the channel
         :return:
         """
-        logger.info('Connecting to rabbitmq server..')
+        logger.debug('Connecting to rabbitmq server..')
         try:
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=settings.RABBITMQ_CONF['host'],
@@ -124,5 +124,6 @@ class RabbitMQReader(object):
 
         try:
             self.channel.basic_ack(method_frame.delivery_tag)
+            logger.debug('MsgID:%s deleted from queue' % method_frame.delivery_tag)
         except AttributeError:
             logger.error('RABBITMQ delete failure for method_frame: %s, type(method_frame): %s' % (method_frame, type(method_frame)))

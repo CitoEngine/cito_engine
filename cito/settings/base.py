@@ -146,14 +146,19 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'south',
-    'tastypie',
     'cito_engine',
     'appauth',
     'reports',
     'comments',
+    'rules_engine',
+    'audit',
 )
 
 STATIC_FILES = PROJECT_ROOT.ancestor(1).child('staticfiles')
+
+INCIDENT_PARAMS = ['event', 'timestamp']
+
+LOGIN_URL = '/login/'
 
 try:
     from .secret_key import *

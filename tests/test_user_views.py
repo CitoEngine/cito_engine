@@ -217,7 +217,6 @@ class TestUpdateUserPerms(TransactionTestCase):
         response = self.client.post('/users/perms/update/', data={'user_id': new_user.id, 'access_level': '5'}, follow=True)
         self.assertRedirects(response, '/users/view/%d/' % new_user.id)
         user = User.objects.get(pk=new_user.id)
-        print user.perms, new_user.perms
         self.assertEquals(user.perms.access_level, 5)
 
         # Test updating once you have perms

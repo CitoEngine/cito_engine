@@ -14,7 +14,8 @@ limitations under the License.
 """
 
 import factory
-
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 
 class PluginServerFactory(factory.DjangoModelFactory):
     FACTORY_FOR = 'cito_engine.PluginServer'
@@ -79,3 +80,33 @@ class EventActionLogFactory(factory.DjangoModelFactory):
     incident = factory.LazyAttribute(lambda n: IncidentFactory())
     event_action = factory.LazyAttribute(lambda n: EventActionFactory())
     text = factory.Sequence(lambda n: 'factory made event_action_log {0}'.format(n))
+
+
+class UserFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = User
+    first_name = factory.Sequence(lambda n: "First%s" % n)
+    last_name = factory.Sequence(lambda n: "Last%s" % n)
+    email = factory.Sequence(lambda n: "email%s@example.com" % n)
+    username = factory.Sequence(lambda n: "email%s@example.com" % n)
+    password = make_password("password")
+    is_staff = False
+
+
+class EventSuppressorFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = 'rules_engine.EventSuppressor'
+    event = factory.LazyAttribute(lambda n: EventFactory())
+    suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
+
+
+class ElementSuppressorFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = 'rules_engine.ElementSuppressor'
+    element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
+    suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
+
+
+class EventAndElementSuppressorFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = 'rules_engine.EventAndElementSuppressor'
+    event = factory.LazyAttribute(lambda n: EventFactory())
+    element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
+    suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
+
