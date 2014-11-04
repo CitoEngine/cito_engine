@@ -76,7 +76,10 @@
                                     <td>{{ i.firstEventTime|date:"M d, Y, H:i" }}</td>
                                     <td>{{ i.lastEventTime|date:"M d, Y, H:i"  }}</td>
                                     <td>{{ i.total_incidents }}</td>
-                                    <td>{% if i.is_suppressed %} Yes {% else %} No {% endif %}</td>
+                                    <td>{% if i.is_suppressed %}
+                                        <input type="button" class="btn btn-success btn-small" value="Yes" name="toggle_submit" onclick="javascript:search_suppression('{{ i.event.id }}', '{{ i.element }}');">
+                                        {% else %} No {% endif %}
+                                    </td>
                                     <td>{{ i.event.category }}</td>
                                     <td>{{ i.event.team }}</td>
 
@@ -116,6 +119,13 @@
                                         $('[name=search_term]').val(search_term);
                                         $('#search_element').submit();
                                     }
+                                    function search_suppression(eventid, element){
+                                        console.log(eventid + ' ' + element);
+                                        $('[name=eventid]').val(eventid);
+                                        $('[name=element]').val(element);
+{#                                        $('#eventid').val(eventid);#}
+                                        $('#search_suppression').submit()
+                                    }
                                 </script>
                          </tbody></table>
     </div>
@@ -129,6 +139,11 @@
                                 <form method="post" id="search_element" action="/incidents/search/element/" accept-charset="."> {% csrf_token %}
                                     <input type="hidden" name="search_term" value="">
                                 </form>
+                                <form method="post" id="search_suppression" action="/suppression/view/" accept-charset="."> {% csrf_token %}
+                                    <input type="hidden" name="eventid" value="" id="eventid">
+                                    <input type="hidden" name="element" value="" id="element">
+                                </form>
+
 
 <!-- Pagination start here -->
                 <div class="dataTables_paginate paging_bootstrap pagination">
