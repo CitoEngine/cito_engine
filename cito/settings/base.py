@@ -26,6 +26,8 @@ except ImportError:
 PROJECT_ROOT = Path(__file__).ancestor(2)
 
 LOG_PATH = PROJECT_ROOT.ancestor(1)
+if not os.path.isdir(LOG_PATH.child('logs')):
+    os.mkdir(LOG_PATH.child('logs'))
 DEBUG = False
 TEMPLATE_DEBUG = False
 
