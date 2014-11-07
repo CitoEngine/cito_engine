@@ -55,7 +55,7 @@ LOGGING = {
         'poller_log_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH.child('logs') + "/poller.log",
+            'filename': LOG_PATH + "/poller.log",
             'maxBytes': 100000000,
             'backupCount': 2,
             'formatter': 'standard',
@@ -63,7 +63,7 @@ LOGGING = {
         'listener_log_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH.child('logs') + "/listener.log",
+            'filename': LOG_PATH + "/listener.log",
             'maxBytes': 100000000,
             'backupCount': 2,
             'formatter': 'standard',
@@ -71,7 +71,7 @@ LOGGING = {
         'auth_log_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH.child('logs') + "/auth.log",
+            'filename': LOG_PATH + "/auth.log",
             'maxBytes': 100000000,
             'backupCount': 2,
             'formatter': 'standard',
