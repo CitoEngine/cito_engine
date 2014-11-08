@@ -60,27 +60,42 @@
                                                               </td>
                                                           </tr>
                                                           {% endif %}
+                                                        <tr>
+                                                        <td>
+                                                            <strong>Suppressed ?</strong>
+                                                        </td>
+                                                            <td colspan="3">
+                                                                {% if incident.is_suppressed %}
+                                                                <form method="post" id="search_suppression" action="/suppression/view/" accept-charset="."> {% csrf_token %}
+                                                                <input type="hidden" name="eventid" value="{{ incident.event.id }}" id="eventid">
+                                                                <input type="hidden" name="element" value="{{ incident.element }}" id="element">
+                                                                <input type="submit" class="btn btn-success btn-small" value="Yes">
+                                                                  </form>
+                                                                {% else %} No {% endif %}
+                                                            </td>
+                                                        </tr>
                                                           <tr>
-                                                            <td colspan="4">
+                                                          <td> <strong>Action: </strong></td>
+                                                            <td colspan="3">
                                                                 {% if incident.status == 'Active' %}
                                                                  <form method="post" action="/incidents/toggle/" accept-charset="."> {% csrf_token %}
                                                                     <input type="hidden" name="incident_id" value="{{ incident.id }}">
                                                                     <input type="hidden" name="incident_status" value="Acknowledged">
                                                                     <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
-                                                                    <input type="submit" class="btn btn-info" value="Acknowledge" name="toggle_submit">
+                                                                    <input type="submit" class="btn btn-info" value="Acknowledge Incident" name="toggle_submit">
                                                                  </form>
                                                                  <form method="post" action="/incidents/toggle/" accept-charset="."> {% csrf_token %}
                                                                     <input type="hidden" name="incident_id" value="{{ incident.id }}">
                                                                     <input type="hidden" name="incident_status" value="Cleared">
                                                                     <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
-                                                                    <input type="submit" class="btn btn-success" value="Close" name="toggle_submit">
+                                                                    <input type="submit" class="btn btn-success" value="Close Incident" name="toggle_submit">
                                                                  </form>
                                                                 {% elif incident.status == 'Acknowledged' %}
                                                                     <form method="post" action="/incidents/toggle/" accept-charset="."> {% csrf_token %}
                                                                         <input type="hidden" name="incident_id" value="{{ incident.id }}">
                                                                         <input type="hidden" name="incident_status" value="Cleared">
                                                                         <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
-                                                                        <input type="submit" class="btn btn-success" value="Close" name="toggle_submit">
+                                                                        <input type="submit" class="btn btn-success" value="Close Incident" name="toggle_submit">
                                                                     </form>
                                                                 {% endif %}
                                                             </td>
