@@ -1,0 +1,145 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid">
+
+
+    <div class="box span12"><!--user info -->
+                        <div class="box-header well">
+                            <h2><i class="icon-info-sign"></i>User Details</h2>
+                        </div>
+                        <div class="box-content">
+                                    <table class="table" width="100%">
+                                                          <tr>
+                                                            <td width="10%"><div ><strong>Name</strong></div></td>
+                                                            <td width="20%">{{ view_user.get_full_name }}</td>
+                                                            <td width="15%"><strong>Username</strong></td>
+                                                            <td width="71%">{{ view_user.username }}</td>
+                                                          </tr>
+                                                          <tr>
+                                                            <td><div><strong>Status</strong></div></td>
+                                                            <td>{% if view_user.is_active %} Active {% else %} Inactive {% endif %}</td>
+                                                            <td><strong>Email</strong></td>
+                                                            <td>{{ view_user.email }}</td>
+                                                          </tr>
+                                                            <tr>
+                                                            <td><div><strong>Date joined</strong></div></td>
+                                                            <td>{{ view_user.date_joined|date:"M d, Y, H:i" }}</td>
+                                                            <td><strong>Last login</strong></td>
+                                                            <td>{{ view_user.last_login|date:"M d, Y, H:i" }}</td>
+                                                          </tr>
+                                    </table>
+
+                                                             <form method="post" action="/users/toggle/" accept-charset="."> {% csrf_token %}
+                                                                    <input type="hidden" name="user_id" value="{{ view_user.id }}">
+                                                                {% if view_user.is_active %}
+                                                                    <input type="hidden" name="user_status" value="disable_user">
+                                                                    <input type="submit" class="btn btn-info" value="Disable User" name="toggle_submit">
+                                                                {% else %}
+                                                                    <input type="hidden" name="user_status" value="enable_user">
+                                                                    <input type="submit" class="btn btn-info" value="Enable User" name="toggle_submit">
+                                                                {% endif %}
+                                                             </form>
+
+                            <div class="btn-group"><a class="btn btn-info" href="/users/edit/{{ view_user.id }}/">Edit Details</a></div>
+                    </div>
+
+    </div> <!--user info -->
+
+
+
+     <div class="box span12"><!--tabs -->
+                        <div class="box-header well">
+                            <h2><i class="icon-info-sign"></i>Teams and Permissions</h2>
+                        </div>
+                           <div class="tabbable tabs-below">
+
+                                <div class="tab-content ">
+                                    <ul class="nav nav-tabs">
+                                                    <li class="active"><a href="#viewteams" data-toggle="tab">Team memberships</a></li>
+                                                    <li><a href="#viewperms" data-toggle="tab">User permissions</a></li>
+
+
+                                    </ul>
+                                    <div class="tab-pane active" id="viewteams"><!-- view teams -->
+                                            <div class="box">
+
+                                                        <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                                         <thead>
+                                                          <tr>
+                                                              <th width="15%">Team</th>
+                                                              <th>Action</th>
+                                                          </tr>
+                                                          </thead>
+                                                        <tbody>
+                                                        {% for team in view_user.team_set.all %}
+                                                            <tr>
+                                                            <td>{{ team.name }}</td>
+                                                            <td>
+                                                                <form method="post" action="/users/team/remove/" accept-charset="."> {% csrf_token %}
+                                                                    <input type="hidden" name="user_id" value="{{ view_user.id }}">
+                                                                    <input type="hidden" name="team_id" value="{{ team.id }}">
+                                                                    <input type="submit" class="btn btn-warning btn-mini" value="Remove" name="toggle_submit">
+                                                                 </form>
+                                                            </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                        </tbody>
+                                                        </table>
+
+                                            </div>
+                                                            <form method="post" action="/users/team/add/" accept-charset="."> {% csrf_token %}
+                                                                    <select class="btn span2" id="team_id" name="team_id">
+                                                                        {% for team in allteams %}
+                                                                        <option value="{{ team.id }}">{{ team.name }}</option>
+                                                                        {% endfor %}
+                                                                     </select>
+                                                                    <input type="hidden" name="user_id" value="{{ view_user.id }}">
+                                                                    <input type="submit" class="btn btn-info" value="Add" name="toggle_submit">
+                                                            </form>
+                                    </div><!--viewteams /-->
+
+                                    <div class="tab-pane" id="viewperms"><!--view perms -->
+                                    <form class="form-horizontal" method="POST" accept-charset="." action="/users/perms/update/"> {% csrf_token %}
+
+                                        <table class="table">
+                                        <tr><td width="25%">
+                                             <input type="hidden" name="user_id" value="{{ view_user.id }}">
+                                                      {% for field in form.visible_fields %}
+                                                        {% if not field.errors %}
+                                                        <div class="control-group">
+                                                          <label class="control-label" for="typeahead">{{ field.label_tag }}</label>
+                                                          <div class="controls col-lg-5">
+                                                              {{ field }}
+                                                          </div>
+                                                        </div>
+
+                                                        {% else %}
+                                                       <div class="control-group error">
+                                                        <label class="control-label" for="inputError">{{ field.label_tag }}</label>
+                                                            <div class="controls">
+                                                              {{ field }}
+                                                              <span class="help-inline">{{ field.errors }}</span>
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                      {% endfor %}
+
+                                        </td>
+                                        <td> <button type="submit" class="btn btn-info btn-small">Update</button></td>
+                                        </tr>
+                                        </table>
+                                    </form>
+
+                                    </div><!--viewperms /-->
+                                </div><!-- tab-content-->
+                            </div> <!-- tabs /-->
+     </div><!--tab container -->
+
+</div> <!-- container -->
+
+
+
+
+{% include 'footer.html' %}

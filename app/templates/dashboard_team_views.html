@@ -1,0 +1,28 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid">
+		<div class="row-fluid">
+
+            <div class="sortable row-fluid">
+
+            {% for team, teamstats in team_dashboard.items %}
+                            <a data-rel="tooltip"  class="well span3 dashboard-block" href="/incidents/view/{{ teamstats.team_id }}/active/">
+                                <div class="alr">{{ teamstats.name }}</div>
+                                <div class="dig">{{ teamstats.active }}/{{ teamstats.acknowledged }}</div>
+                            </a>
+                        {% if forloop.counter|divisibleby:"3" %}
+                            </div>
+                            <div class="sortable row-fluid">
+
+                        {% endif %}
+
+
+            {% endfor %}
+    </div>
+
+
+</div> <!-- container -->
+
+{% include 'footer.html' %}

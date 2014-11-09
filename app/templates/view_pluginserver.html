@@ -1,0 +1,100 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+
+<div class="container-fluid">
+<div class="box span12">
+    <div class="box-header well">
+        <h2><i class="icon-user"></i>{{ page_title }}</h2>
+        <div class="btn-group pull-right"><a class="btn btn-success btn-mini" href="/pluginservers/edit/{{ pluginserver.id }}"><i class="icon-pencil"></i>Edit</a></div>
+        <div class="btn-group pull-right">&nbsp;</div>
+        <div class="btn-group pull-right"><a class="btn btn-info btn-mini" href="/pluginservers/refresh/{{ pluginserver.id }}"><i class="icon-refresh"></i>Refresh</a></div>
+    </div>
+    <div class="box-content">
+                <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                                                  <tbody>
+                                                                  <tr>
+                                                                    <td width="12%"><div><strong>Name:</strong></div></td>
+                                                                    <td>{{ pluginserver.name }}</td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                    <td><strong>URL:</strong></td>
+                                                                    <td>{{ pluginserver.url }}</td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                    <td><div><strong>Status:</strong></div></td>
+                                                                    <td>{% if pluginserver.status %} <span>Enabled</span>
+                                                                    {% else %} <span class="label label-important">Disabled</span> {% endif %}</td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                      <td><div><strong>Plugins</strong></div></td>
+                                                                      <td><span class="badge badge-info">Active {{ pluginserver.activePlugins }}</span>
+                                                                          <span class="badge badge-warning">Inactive {{ pluginserver.inactivePlugins }}</span>
+                                                                      </td>
+                                                                  </tr>
+
+
+                            </tbody></table>
+
+    </div>
+
+</div>
+</div> <!-- container -->
+
+
+
+<div class="container-fluid">
+    <div class="box span12">
+        <div class="box-header well">
+                <h2><i class="icon-info-sign"></i>Plugins</h2>
+        </div>
+    </div>
+</div>
+
+
+<!-- event actions -->
+
+{% if pluginserver.plugins %}
+    {% for plugin in pluginserver.plugins %}
+        <div class="container-fluid">
+            <div class="box span12">
+
+                <div class="box-content">
+
+                            <table width="100%" class="table table-bordered">
+                                                                  <tbody>
+                                                                  <tr>
+                                                                    <td width="12%"><div><strong>Plugin:</strong></div></td>
+                                                                    <td>{{ plugin.name }}</td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                    <td><div><strong>Description:</strong></div></td>
+                                                                    <td>{{ plugin.description }}</td>
+                                                                  </tr>
+                                                                 <tr>
+                                                                    <td><div><strong>Added on: </strong></div></td>
+                                                                    <td>{{ plugin.dateAdded }}</td>
+                                                                 </tr>
+                                                                 <tr>
+                                                                    <td><div><strong>Last updated: </strong></div></td>
+                                                                    <td>{{ plugin.lastUpdated }}</td>
+                                                                 </tr>
+
+                                                                 <tr>
+                                                                    <td><div><strong>Status:</strong></div></td>
+                                                                    <td>{% if plugin.status %} <span class="">Enabled</span>
+                                                                    {% else %} <span class="label label-important">Disabled</span> {% endif %}</td>
+                                                                  </tr>
+
+                            </tbody></table>
+
+            </div>
+</div>
+</div>
+    {% endfor %}
+{% endif %}
+
+
+
+{% include 'footer.html' %}

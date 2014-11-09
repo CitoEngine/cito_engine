@@ -1,0 +1,51 @@
+{% include 'header.html' %}
+
+
+{%  include 'top_nav_bar.html' %}
+
+        <div class="container-fluid">
+            {% include 'noscript.html' %}
+            <div id="content" class="span12">
+            <!-- content starts -->
+            {% if not errors %}
+            <div class="row-fluid sortable">
+                <div class="box span12">
+                    <div class="box-header well">
+                        <h2><i class="icon-plus"></i>{{ box_title }}</h2>
+                    </div>
+
+                    <div class="box-content">
+                        <form class="form-horizontal" method="POST" accept-charset="." {% if form_action %} action="{{ form_action }}"{% endif %}>
+                            {% csrf_token %}
+                            {{ formset.management_form }}
+                                {% for form in formset %}
+                                  <p class="badge badge-success">Event {{ forloop.counter }}</p>
+                                    <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                        {{ form }}
+                                    </table>
+
+                                {% endfor %}
+                            <div>
+                                <button type="submit" class="btn btn-primary btn-small">Save Button</button>
+                                <button type="button" class="btn btn-small"  onclick="javascript:history.go(-1)">Cancel</button>
+                            </div>
+                        </form>
+
+                     </div>
+                </div>
+            </div>
+            {% elif errors %}
+{#                <div class="btn-group span12">#}
+                    <div class="alert alert-error span12">
+                    <ul>
+                        {% for error in errors %}
+                               <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="javascript:history.go(-1)">Go Back</button>
+{#                </div>#}
+            {% endif %}
+        </div>
+    </div>
+{% include 'footer.html' %}

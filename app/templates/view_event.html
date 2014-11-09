@@ -1,0 +1,149 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+
+<div class="container-fluid">
+{% if dry_run_response %}
+<!-- dry run results -->
+<div class="panel panel-success span12">
+        <div class="panel-heading">
+          <h3 class="panel-title">Test run results</h3>
+        </div>
+        <div class="panel-body">
+          {{ dry_run_response }}
+        </div>
+      </div>
+{% endif %}
+
+<div class="box span12">
+    <div class="box-header well">
+        <h2><i class="icon-user"></i>{{ page_title }}</h2>
+        <div class="btn-group pull-right"><a class="btn btn-success btn-mini" href="/events/edit/{{ event.id }}"><i class="icon-pencil"></i>Edit</a></div>
+
+    </div>
+    <div class="box-content">
+                <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                  <tbody>
+                                  <tr>
+                                    <td width="12%"><div><strong>Summary:</strong></div></td>
+                                    <td>{{ event.summary }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{{ event.description }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Severity:</strong></td>
+                                    <td>{{ event.severity }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><div><strong>Team:</strong></div></td>
+                                    <td>{{ event.team }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><div><strong>Category:</strong></div></td>
+                                    <td>{{ event.category }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><div><strong>Status:</strong></div></td>
+                                    <td>{% if event.status %} <span class="label label-success">Enabled</span>
+                                    {% else %} <span class="label label-important">Disabled</span> {% endif %}</td>
+                                  </tr>
+
+                            </tbody></table>
+    </div>
+</div>
+</div> <!-- container -->
+
+
+
+<div class="container-fluid">
+    <div class="box span12">
+        <div class="box-header well">
+                <h2><i class="icon-info-sign"></i>Event Actions</h2>
+        </div>
+    </div>
+</div>
+
+
+<!-- event actions -->
+
+{% if eventActions %}
+    {% for eventAction in eventActions %}
+        <div class="container-fluid">
+            <div class="box span12">
+
+                <div class="box-content">
+
+                            <table width="100%" class="table table-bordered">
+                                  <tbody>
+                                  <tr>
+                                      <td colspan="1"> <div class="btn-group">
+                                          <a class="btn btn-success btn-mini" href="/eventactions/edit/{{ eventAction.id }}">
+                                              <i class="icon-pencil"></i>Edit Action #{{ forloop.counter }}</a></div>
+                                      </td><td>
+                                  <div class="btn-group">
+                                          <form class="form-inline" method="POST" accept-charset=".">
+                                              {% csrf_token %}
+                                              <input type="hidden" name="event_action_id" value="{{ eventAction.id }}">
+                                              <button type="submit" class="btn btn-mini btn-info">
+                                                  <i class="icon-wrench"></i>Test this action
+                                                </button>
+                                          </form>
+                                          </div>
+                                  </td>
+                                  </tr>
+
+                                  <tr>
+                                    <td width="12%"><div><strong>Plugin:</strong></div></td>
+                                    <td>{{ eventAction.plugin.name }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><div><strong>Plugin Server:</strong></div></td>
+                                    <td>{{ eventAction.plugin.server }}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><div><strong>Threshold:</strong></div></td>
+                                    <td>{{ eventAction.threshold_count }} events in {{ eventAction.threshold_timer }} seconds</td>
+                                 </tr>
+                                 <tr>
+                                    <td><div><strong>Added on: </strong></div></td>
+                                    <td>{{ eventAction.dateAdded }}</td>
+                                 </tr>
+                                 <tr>
+                                    <td><div><strong>Last updated: </strong></div></td>
+                                    <td>{{ eventAction.dateUpdated }}</td>
+                                 </tr>
+                                  <tr>
+                                    <td><div><strong>Parameters: </strong></div></td>
+                                    <td><code>{{ eventAction.pluginParameters }}</code></td>
+                                 </tr>
+                                 <tr>
+                                    <td><div><strong>Status:</strong></div></td>
+                                    <td>{% if eventAction.isEnabled %} <span class="">Enabled</span>
+                                    {% else %} <span class="label label-important">Disabled</span> {% endif %}</td>
+                                  </tr>
+
+                            </tbody></table>
+
+            </div>
+</div>
+</div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="container-fluid">
+    <div class=" span12">
+        <div class="btn-group"><a class="btn btn-info" href="/eventactions/add/{{ event.id }}"><i class="icon-plus"></i>Add an action to this event</a></div>
+    </div>
+</div>
+
+<!-- event actions /-->
+
+
+
+
+
+{% include 'footer.html' %}
