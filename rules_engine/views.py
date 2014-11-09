@@ -26,7 +26,7 @@ class SuppressionSearchView(LoginRequiredMixin, FormView):
     """
     Search suppressed events and elements
     """
-    template_name = 'suppressor_view.html'
+    template_name = 'view_suppression.html'
     form_class = SuppressionSearchForm
     # success_url = '/suppression/view/'
 
@@ -63,6 +63,11 @@ class SuppressionAddView(LoginRequiredMixin, FormView):
     template_name = 'generic_form.html'
     form_class = SuppressionAddForm
     success_url = '/suppression/view/'
+
+    def get_context_data(self, **kwargs):
+        context = super(SuppressionAddView, self).get_context_data(**kwargs)
+        context['page_title'] = context['box_title'] = 'Add suppression'
+        return context
 
     def form_valid(self, form):
         form.save(user=self.request.user)
