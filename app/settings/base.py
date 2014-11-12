@@ -165,6 +165,10 @@ INCIDENT_PARAMS = ['event', 'timestamp']
 
 LOGIN_URL = '/login/'
 
+AWS_CONF = dict()
+RABBITMQ_CONF = dict()
+POLLER_CONFIG = dict()
+
 try:
     from .secret_key import *
 except ImportError:
