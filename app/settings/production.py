@@ -126,7 +126,6 @@ DATABASES = {
 ##################################
 # AWS::SQS Configuration settings
 ##################################
-AWS_CONF = dict()
 AWS_CONF['region'] = 'us-east-1'
 AWS_CONF['awskey'] = ''
 AWS_CONF['awssecret'] = ''
@@ -136,7 +135,6 @@ AWS_CONF['sqsqueue'] = 'citoq'
 ##################################
 # RabbitMQ Configuration settings
 ##################################
-RABBITMQ_CONF = dict()
 RABBITMQ_CONF['host'] = 'localhost'
 RABBITMQ_CONF['port'] = 5672
 RABBITMQ_CONF['username'] = 'cito_user'
@@ -156,7 +154,6 @@ QUEUE_TYPE = 'RABBITMQ'
 ##############################
 # Event Poller config
 ##############################
-POLLER_CONFIG = dict()
 
 # Polling interval in seconds
 POLLER_CONFIG['interval'] = 5
@@ -167,23 +164,3 @@ POLLER_CONFIG['batchsize'] = 10
 # How long should the poller hold on the the message before someone else picks it up on
 # Leave this to 60 seconds if you don't know what you are doing.
 POLLER_CONFIG['visibility'] = 60
-
-
-########################################
-# Dispatcher config
-# (will be deprecated in future release
-########################################
-DISPATCHER_CONFIG = dict()
-
-# Polling interval
-DISPATCHER_CONFIG['interval'] = 10
-
-# Job lock expire time
-DISPATCHER_CONFIG['lock_expire'] = 30
-
-
-##############################
-# Event Listener config
-##############################
-EVENT_LISTENER_CONFIG = dict()
-EVENT_LISTENER_CONFIG['port'] = 8080

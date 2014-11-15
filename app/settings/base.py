@@ -16,7 +16,7 @@ limitations under the License.
 
 import os
 import sys
-import logging
+
 try:
     from unipath import Path
 except ImportError:
@@ -129,10 +129,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'cito.urls'
+ROOT_URLCONF = 'settings.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'cito.wsgi.application'
+WSGI_APPLICATION = 'settings.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -159,11 +159,15 @@ INSTALLED_APPS = (
     'audit',
 )
 
-STATIC_FILES = PROJECT_ROOT.ancestor(1).child('staticfiles')
+STATIC_FILES = PROJECT_ROOT.child('staticfiles')
 
 INCIDENT_PARAMS = ['event', 'timestamp']
 
 LOGIN_URL = '/login/'
+
+AWS_CONF = dict()
+RABBITMQ_CONF = dict()
+POLLER_CONFIG = dict()
 
 try:
     from .secret_key import *

@@ -8,11 +8,11 @@ install:
     - "pip install coveralls"
 before_script: 
     - mysql -e 'create database cito;'
-    - python manage.py syncdb --noinput
-    - python manage.py migrate
+    - python app/manage.py syncdb --noinput
+    - python app/manage.py migrate
 # command to run tests
 script: 
-    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  manage.py test
+    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  app/manage.py test
 after_success:
     - coveralls
 notifications:
