@@ -149,6 +149,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'django_extensions',
     'gunicorn',
     'south',
     'cito_engine',
@@ -179,3 +180,4 @@ try:
     from .ldap_auth import *
 except ImportError:
     print "LDAP settings not found or mis-configured, CitEngine will use internal authentication"
+
