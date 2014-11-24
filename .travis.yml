@@ -4,15 +4,16 @@ python:
   - "2.7"
 # command to install dependencies
 install: 
-    - "pip install -r requirements-dev.txt"
+    - cd app/
+    - "pip install -r ../requirements-dev.txt"
     - "pip install coveralls"
 before_script: 
     - mysql -e 'create database citoengine;'
-    - python app/manage.py syncdb --noinput
-    - python app/manage.py migrate
+    - python manage.py syncdb --noinput
+    - python manage.py migrate
 # command to run tests
 script: 
-    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  app/manage.py test
+    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  manage.py test
 after_success:
     - coveralls
 notifications:
