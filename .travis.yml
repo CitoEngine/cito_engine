@@ -2,17 +2,20 @@ language: python
 python:
   - "2.6"
   - "2.7"
+env:
+  - DJANGO_SETTINGS_MODULE=settings.dev
 # command to install dependencies
 install: 
-    - "pip install -r requirements.txt"
+    - cd app/
+    - "pip install -r ../requirements-dev.txt"
     - "pip install coveralls"
 before_script: 
-    - mysql -e 'create database cito;'
-    - python app/manage.py syncdb --noinput
-    - python app/manage.py migrate
+    - mysql -e 'create database citoengine;'
+    - python manage.py syncdb --noinput
+    - python manage.py migrate
 # command to run tests
 script: 
-    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  app/manage.py test
+    - coverage run --source='.' --omit=tests*,fabfile*,*admin*,*urls*,*manage*,*/settings/*,*wsgi*,*/migrations/*  manage.py test
 after_success:
     - coveralls
 notifications:
