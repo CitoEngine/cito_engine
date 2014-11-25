@@ -111,7 +111,7 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'cito',                         # Or path to database file if using sqlite3.
+        'NAME': 'citoengine',                         # Or path to database file if using sqlite3.
         'USER': '',                             # Not used with sqlite3.
         'PASSWORD': '',                         # Not used with sqlite3.
         'HOST': '',                             # Set to empty string for localhost. Not used with sqlite3.
@@ -130,7 +130,7 @@ DATABASES = {
 AWS_CONF['region'] = 'us-east-1'
 AWS_CONF['awskey'] = ''
 AWS_CONF['awssecret'] = ''
-AWS_CONF['sqsqueue'] = 'citoq'
+AWS_CONF['sqsqueue'] = 'citoengine_queue'
 
 
 ##################################
@@ -138,12 +138,12 @@ AWS_CONF['sqsqueue'] = 'citoq'
 ##################################
 RABBITMQ_CONF['host'] = 'localhost'
 RABBITMQ_CONF['port'] = 5672
-RABBITMQ_CONF['username'] = 'cito_user'
+RABBITMQ_CONF['username'] = 'citoengine'
 RABBITMQ_CONF['password'] = 'CHANGEME!'
 RABBITMQ_CONF['ssl'] = False
 RABBITMQ_CONF['exchange'] = ''
-RABBITMQ_CONF['vhost'] = '/cito_event_listener'
-RABBITMQ_CONF['queue'] = 'cito_commonq'
+RABBITMQ_CONF['vhost'] = '/citoengine_event_listener'
+RABBITMQ_CONF['queue'] = 'citoengine_commonq'
 
 
 ##############################
