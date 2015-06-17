@@ -20,7 +20,7 @@ from cito_engine.poller import event_poller
 
 class Command(BaseCommand):
 
-    help = 'Start CitoEngine Event Poller'
+    help = 'Starts CitoEngine Event Poller'
 
     def handle(self, *args, **options):
         e = event_poller.EventPoller()
