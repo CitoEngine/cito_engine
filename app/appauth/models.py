@@ -26,7 +26,7 @@ class Perms(models.Model):
         (4, 'NocUser'),
         (5, 'ReportsUser')
     )
-    access_level = models.SmallIntegerField(max_length=1, choices=PERMISSION_LEVEL, default=5)
+    access_level = models.SmallIntegerField(choices=PERMISSION_LEVEL, default=5)
 
     def __unicode__(self):
         return '%s:%s' % (self.user.username, self.get_access_level_display())
