@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from __future__ import absolute_import
 from django.conf.urls import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
@@ -77,10 +77,10 @@ urlpatterns += patterns('',
                         url(r'^dashboard/$', 'cito_engine.views.dashboards.teamview'),
                         )
 
-#TODO: Remove addevent before releasing v1.0
+# #TODO: Remove addevent before releasing v1.0
 urlpatterns += patterns('',
                         url(r'^addevent/$', IncidentListenerAPI.as_view()),
-                        url(r'^api/incidents/add/$', IncidentListenerAPI.as_view()),
+                        url(r'^api/v1/incidents/add/$', IncidentListenerAPI.as_view()),
                         )
 
 urlpatterns += patterns('',
