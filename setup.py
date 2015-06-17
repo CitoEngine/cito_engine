@@ -19,6 +19,11 @@ for root, dirs, files in os.walk('app'):
             app_content[root].append(filepath)
 
 conf_files = [('conf', glob('app/settings/*-example'))]
+bin_files = defaultdict(list)
+for root, dirs, files in os.walk('bin'):
+    for filename in files:
+        filepath = os.path.join(root, filename)
+        bin_files[root].append(filepath)
 log_dir = [('logs', '')]
 
 
@@ -41,7 +46,7 @@ setup(
     url='http://www.citoengine.org',
     license='Apache Software License 2.0',
     package_dir={'': 'app'},
-    data_files=app_content.items()+conf_files+log_dir,
+    data_files=app_content.items()+conf_files+bin_files.items()+log_dir,
     **setup_kwargs
 )
 
