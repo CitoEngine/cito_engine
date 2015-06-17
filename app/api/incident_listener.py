@@ -1,5 +1,4 @@
-__author__ = 'cyrus.dasadia'
-
+from __future__ import absolute_import
 import json
 import gevent
 import logging
@@ -9,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from queue_manager.sqs import sqs_writer
 from queue_manager.rabbitmq import rabbitmq_writer
-from .json_responses import json_error, json_ok
+from api.json_responses import json_error, json_ok
 
 logger = logging.getLogger('listener_logger')
 
@@ -55,4 +54,5 @@ class IncidentListenerAPI(View):
                              (settings.QUEUE_TYPE, settings.SETTINGS_MODULE))
 
         gevent.spawn(queue_writer, request.body)
+        gevent.sleep(0)
         return json_ok('accepted')
