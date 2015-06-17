@@ -21,6 +21,7 @@ class EventActionForm(ModelForm):
     class Meta:
         model = EventAction
         widgets = {'event': HiddenInput}
+        fields = '__all__'
 
     def clean_threshold_count(self):
         threshold_count = self.cleaned_data['threshold_count']

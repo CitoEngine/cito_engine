@@ -23,6 +23,7 @@ class PluginServerForm(ModelForm):
 
     class Meta:
         model = PluginServer
+        fields = '__all__'
 
 
 class PluginSearchForm(Form):

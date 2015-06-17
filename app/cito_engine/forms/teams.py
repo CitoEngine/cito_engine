@@ -21,7 +21,8 @@ from cito_engine.models import Team
 class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
-        
+        fields = '__all__'
+
     def __init__(self, *args, **kwargs):
         super(TeamForm, self).__init__(*args, **kwargs)
         self.fields['members'].widget = forms.widgets.CheckboxSelectMultiple()
