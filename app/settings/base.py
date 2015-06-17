@@ -151,7 +151,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django_extensions',
     'gunicorn',
-    'south',
     'cito_engine',
     'appauth',
     'reports',
