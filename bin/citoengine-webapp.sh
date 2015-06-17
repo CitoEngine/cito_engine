@@ -1,5 +1,5 @@
 #!/bin/bash
-#    Copyright 2014 Cyrus Dasadia
+#    Copyright 2014-2015 Cyrus Dasadia
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,32 +15,34 @@
 
 
 set -e
-export DJANGO_SETTINGS_MODULE='cito.settings.production' 
+APP_ROOT=/opt/citoengine/
+APP_DIR=${APP_ROOT}/app
 
-LOGFILE=/opt/cito/logs/cito-webapp.log
+LOGFILE=${APP_ROOT}/logs/cito-webapp.log
 LOGDIR=$(dirname $LOGFILE)
 NUM_WORKERS=2
 PORT=8000
-BIND_IP=0.0.0.0:$PORT
+BIND_IP=0.0.0.0:${PORT}
 
 # user/group to run as
-#USER=www-data
-#GROUP=www-data
+USER=root
+GROUP=root
 
-if [ $USER != "www-data" ]; then
+if [ ${USER} != "www-data" ]; then
     echo "!!!WARNING!! You should probably run this script with www-data"
-    GROUP=$USER
 fi
 
 
-# switch to project dir, activate virtual environment
-cd /opt/cito
-source /opt/virtualenvs/citovenv/bin/activate
+# switch to project dir, activate
+# virtual environment
+cd ${APP_DIR}
+source ${APP_ROOT}/bin/activate
 
-test -d $LOGDIR || mkdir -p $LOGDIR
+test -d ${LOGDIR} || mkdir -p ${LOGDIR}
 
-python manage.py run_gunicorn \
-	--workers $NUM_WORKERS \
-	--user=$USER --group=$GROUP \
-	--log-level=debug --log-file=$LOGFILE 2>>$LOGFILE --bind $BIND_IP
 
+gunicorn settings.wsgi\
+    --workers ${NUM_WORKERS} \
+    --worker-class gevent  \
+    --user=${USER} --group=${GROUP} \
+    --log-level=debug --log-file=${LOGFILE} 2>>${LOGFILE} --bind ${BIND_IP}

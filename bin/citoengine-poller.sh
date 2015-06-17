@@ -1,5 +1,5 @@
-# Upstart for cito webapp
-#    Copyright 2014 Cyrus Dasadia
+#!/bin/bash
+#    Copyright 2014-2015 Cyrus Dasadia
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,16 +12,12 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+set -e
+APP_ROOT=/opt/citoengine/
+APP_DIR=${APP_ROOT}/app
 
-description "CitoEngine Webapp start/stop script"
-version "1.0"
-author "Cyrus Dasadia [cyrus@citoengine.org]"
-
-start on runlevel [2345]
-stop on runlevel [016]
-
-respawn 
-respawn limit 10 5
-
-exec /opt/cito/bin/cito-webapp.sh
+cd ${APP_DIR}
+source ${APP_ROOT}bin/activate
+echo 'Starting CitoEngine Poller'
+python manage.py poller
 

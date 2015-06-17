@@ -19,9 +19,9 @@ if [ $USER != 'root' ];then
     exit 1
 fi
 
-for mojofication in webapp listener poller; do
-    echo "Configuring cito-$mojofication.."
-    ln -sf /lib/init/upstart-job /etc/init.d/cito-$mojofication
-    cp /opt/cito/bin/upstart/cito-$mojofication.conf /etc/init/
-    /usr/sbin/update-rc.d cito-$mojofication defaults
+for mojofication in webapp poller; do
+    echo "Configuring citoengine-$mojofication.."
+    ln -sf /lib/init/upstart-job /etc/init.d/citoengine-$mojofication
+    cp /opt/citoengine/bin/upstart/citoengine-$mojofication.conf /etc/init/
+    /usr/sbin/update-rc.d citoengine-$mojofication defaults
 done
