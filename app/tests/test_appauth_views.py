@@ -40,7 +40,7 @@ class TestAppauthViews(TestCase):
         # Test for a normal report user (lowest perms)
         self.user.is_superuser = False
         self.assertTrue(check_and_create_perms(self.user))
-        self.assertEquals(self.user.perms.access_level, 5)
+        self.assertEquals(self.user.perms.access_level, 3)
 
     def test_login_view(self):
         """Test user login"""
@@ -57,7 +57,7 @@ class TestAppauthViews(TestCase):
         self.user.is_superuser = False
         self.user.save()
         response = self.client.post('/login/', data=dict(username='hodor', password='hodor'), follow=True)
-        self.assertRedirects(response, '/reports/')
+        self.assertRedirects(response, '/incidents/')
 
     def test_login_with_bad_username_and_password(self):
         """
