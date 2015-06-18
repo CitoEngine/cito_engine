@@ -31,7 +31,7 @@ def check_and_create_perms(user):
             Perms.objects.create(user=user, access_level=1).save()
         #else we make it a reportuser
         else:
-            Perms.objects.create(user=user, access_level=5).save()
+            Perms.objects.create(user=user, access_level=3).save()
     return True
 
 
