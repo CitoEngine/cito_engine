@@ -11,7 +11,6 @@ install:
     - "pip install coveralls"
 before_script: 
     - mysql -e 'create database citoengine;'
-    - python manage.py syncdb --noinput
     - python manage.py migrate
 # command to run tests
 script: 
