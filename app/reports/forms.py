@@ -37,19 +37,22 @@ class AllIncidentsReportForm(Form):
         (u'S3', u'S3'),
     )
 
-    team_list = [(0, u'All')]
-    teams = Team.objects.all()
-    for team in teams:
-        team_list.append((team.id, team.name))
-
-    team = ChoiceField(choices=team_list, label="Team")
+    team = ChoiceField(label="Team")
     timerange = ChoiceField(choices=time_choices, label="Range")
     severity = ChoiceField(choices=event_severity, label='Severity')
     csv_export = BooleanField(label="Export as CSV", required=False)
 
+    def __init__(self, *args, **kwargs):
+        super(AllIncidentsReportForm, self).__init__(*args, **kwargs)
+        self.team_list = [(0, u'All')]
+        for team in Team.objects.all():
+            self.team_list.append((team.id, team.name))
+        self.fields['team'].choices = self.team_list
+
+
 
 class EventsPerTeam(Form):
-    team_list = [(0, u'All')]
+
     time_choices = (
         ('1', 'Last 24hours'),
         ('7', 'Last week'),
@@ -61,19 +64,21 @@ class EventsPerTeam(Form):
         ('50', '50'),
         ('100', '100'),
     )
-    teams = Team.objects.all()
-    for team in teams:
-        team_list.append((team.id, team.name))
 
-    team = ChoiceField(choices=team_list, label="Team")
+    team = ChoiceField(label="Team")
     timerange = ChoiceField(choices=time_choices, label="Range")
     event_id = IntegerField(required=False, min_value=1, label="Event ID")
     result_limit = ChoiceField(choices=result_limit_choices, label="Results")
 
     def __init__(self, *args, **kwargs):
-        super(Form, self).__init__(*args, **kwargs)
+        super(EventsPerTeam, self).__init__(*args, **kwargs)
         # change a widget attribute:
         self.fields['event_id'].widget.attrs["placeholder"] = 'Search by EventID or leave blank'
+        self.team_list = [(0, u'All')]
+        for team in Team.objects.all():
+            self.team_list.append((team.id, team.name))
+        self.fields['team'].choices = self.team_list
+
 
 
 class MostAlertedElements(Form):
