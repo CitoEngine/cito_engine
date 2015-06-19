@@ -5,13 +5,8 @@ from cito_engine.models import Team, Category
 class BulkUploadForm(forms.Form):
 
     list_of_items = forms.CharField(widget=forms.Textarea, label='Paste items here')
-    team_list = []
-    [team_list.append((t.id, t.name)) for t in Team.objects.all()]
-    team = forms.ChoiceField(choices=team_list, label="Team")
-
-    category_list = []
-    [category_list.append((c.id, c.categoryType)) for c in Category.objects.all()]
-    category = forms.ChoiceField(choices=category_list, label="Category")
+    team = forms.ChoiceField(label="Team")
+    category = forms.ChoiceField(label="Category")
 
     severity_list = (
         ('S0', 'S0'),
@@ -25,3 +20,9 @@ class BulkUploadForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(BulkUploadForm, self).__init__(*args, **kwargs)
         self.fields['list_of_items'].widget.attrs['rows'] = "15"
+        self.team_list = []
+        [self.team_list.append((t.id, t.name)) for t in Team.objects.all()]
+        self.category_list = []
+        [self.category_list.append((c.id, c.categoryType)) for c in Category.objects.all()]
+        self.fields['category'].choices = self.category_list
+        self.fields['team'].choices = self.team_list
