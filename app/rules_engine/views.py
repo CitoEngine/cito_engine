@@ -33,6 +33,8 @@ class SuppressionSearchView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(SuppressionSearchView, self).get_context_data(**kwargs)
         context['page_title'] = 'Search Suppression'
+        context['count_total_suppressed'] = EventSuppressor.objects.count() + ElementSuppressor.objects.count()
+        context['count_total_suppressed'] = EventAndElementSuppressor.objects.count()
         return context
 
     def form_valid(self, form):
