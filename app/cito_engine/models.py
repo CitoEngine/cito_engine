@@ -218,16 +218,6 @@ class EventActionCounter(models.Model):
         self.is_triggered = False
         self.save()
 
-    def check_threshold(self):
-        if self.count >= self.event_action.threshold_count and self.timer <= self.event_action.threshold_timer:
-            self._reset()
-            return True
-        elif self.timer > self.event_action.threshold_timer:
-            self._reset()
-            return True
-        else:
-            return False
-
     def __unicode__(self):
         return '%s:%s' % (self.incident.id, self.event_action.plugin)
 
