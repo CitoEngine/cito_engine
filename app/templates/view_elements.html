@@ -2,7 +2,7 @@
 {%  include 'top_nav_bar.html' %}
     {% include 'noscript.html' %}
 
-<div class="container-fluid">
+<div class="container-fluid span12">
 
     <div class="box">
         <div class="box-content">
@@ -85,21 +85,16 @@
                                     console.log($)
                                 </script>
                          </tbody></table>
-    </div>
-    {% endif %}
-
-</div>
-
-<div class="box">
-        <div class="box-content">
-            <form class="form-horizontal" method="POST" accept-charset="." action="/reports/elements/incidents/"> {% csrf_token %}
+    <form class="form-horizontal" method="POST" accept-charset="." action="/reports/elements/incidents/"> {% csrf_token %}
             <input type="hidden" name="element" value="{{ search_term }}">
             <input type="hidden" name="timerange" value="7">
             <input type="hidden" name="result_limit" value="25">
             <button type="submit" class="btn btn-primary btn-small">Click here to view past alerts for {{ search_term }}</button>
             </form>
-        </div>
     </div>
+
+    {% endif %}
+
+
+</div>
 {% include 'footer.html' %}
-
-
