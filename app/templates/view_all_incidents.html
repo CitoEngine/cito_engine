@@ -1,0 +1,180 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid">
+		<div class="row-fluid">
+            {% if team %}
+			<div class="sortable row-fluid">
+				<a data-rel="tooltip"  class="well span3 top-block1" href="/incidents/view/{{ team.id }}/active/">
+					<div class="alr">Active</div>
+					<div class="dig">{{ stats.active }}</div>
+				</a>
+				<a data-rel="tooltip"  class="well span3 top-block3" href="/incidents/view/{{ team.id }}/acknowledged/">
+
+					<div class="alr">Ack'ed</div>
+					<div class="dig">{{ stats.acknowledged }}</div>
+				</a>
+				<a data-rel="tooltip"  class="well span3 top-block2" href="/incidents/view/{{ team.id }}/cleared/">
+					<div class="alr">Cleared</div>
+					<div class="dig">{{ stats.cleared }}</div>
+				</a>
+			</div>
+            {% else %}
+			<div class="sortable row-fluid">
+				<a data-rel="tooltip"  class="well span3 top-block1" href="/incidents/view/active/">
+					<div class="alr">Active</div>
+					<div class="dig">{{ stats.active }}</div>
+				</a>
+				<a data-rel="tooltip"  class="well span3 top-block3" href="/incidents/view/acknowledged/">
+
+					<div class="alr">Ack'ed</div>
+					<div class="dig">{{ stats.acknowledged }}</div>
+				</a>
+				<a data-rel="tooltip"  class="well span3 top-block2" href="/incidents/view/cleared/">
+					<div class="alr">Cleared</div>
+					<div class="dig">{{ stats.cleared }}</div>
+				</a>
+			</div>
+            {% endif %}
+    </div>
+
+<div class="box ">
+    <div class="box-header well">
+        <h2><i class="icon-info-sign"></i>{{ page_title }}</h2>
+    </div>
+    <div class="box-content">
+                <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                 <thead>
+								  <tr>
+                                      <th>Severity</th>
+									  <th>Incident ID</th>
+									  <th>[EventID] Summary</th>
+									  <th>Element</th>
+									  <th>First Occurence</th>
+									  <th>Last Occurence</th>
+									  <th>Count</th>
+									  <th>Suppressed?</th>
+									  <th>Category</th>
+									  <th>Team</th>
+                                      {% if incident_status != 'active' %}
+									  <th>Assignee</th>
+                                      {% endif %}
+                                      <th>&nbsp;</th>
+								  </tr>
+							  </thead>
+							  <tbody>
+
+
+                                <!-- Table 1st row -->
+                                {% for i in incidents %}
+                                    <tr>
+                                    <td>{{ i.event.severity }}</td>
+                                    <td><div class="btn-group"><a class="btn btn-info btn-mini" href="/incidents/view/{{ i.id }}"><i class="icon-list"></i>View {{ i.id }}</a></div>
+                                    <td>[<a href="/events/view/{{ i.event.id }}">{{ i.event.id }}</a>] {{ i.event.summary }}</td>
+                                    <td><input type="button" class="btn btn-info btn-small" value="{{ i.element }}" onclick="javascript:search_element_form('{{ i.element }}');"></td>
+                                    <td>{{ i.firstEventTime|date:"M d, Y, H:i" }}</td>
+                                    <td>{{ i.lastEventTime|date:"M d, Y, H:i"  }}</td>
+                                    <td>{{ i.total_incidents }}</td>
+                                    <td>{% if i.is_suppressed %}
+                                        <input type="button" class="btn btn-success btn-small" value="Yes" name="toggle_submit" onclick="javascript:search_suppression('{{ i.event.id }}', '{{ i.element }}');">
+                                        {% else %} No {% endif %}
+                                    </td>
+                                    <td>{{ i.event.category }}</td>
+                                    <td>{{ i.event.team }}</td>
+
+                                    {% if incident_status != 'active' %}
+                                     <td>
+                                        {% if i.status == 'Active' %}
+                                            None
+                                        {% elif i.status == 'Acknowledged' %}
+                                           <a href="/users/view/{{ i.acknowledged_by.id }}/">{{ i.acknowledged_by }} </a>
+                                        {% else %}
+                                             <a href="/users/view/{{ i.closed_by.id }}/">{{ i.closed_by }}</a>
+                                        {% endif %}
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        {% if i.status == 'Active' %}
+                                            <input type="button" class="btn btn-info btn-small" value="Ack" name="toggle_submit" onclick="javascript:toggle_status('Acknowledged', {{ i.id }});">
+                                            <input type="button" class="btn btn-success btn-small" value="Clear" name="toggle_submit" onclick="javascript:toggle_status('Cleared', {{ i.id }});">
+                                        {% elif i.status == 'Acknowledged' %}
+                                            <input type="button" class="btn btn-success btn-small" value="Clear" name="toggle_submit" onclick="javascript:toggle_status('Cleared', {{ i.id }});">
+                                        {% else %}
+                                            <span class="label label-info">Cleared</span>
+                                        {% endif %}
+
+
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                                                        <!-- Table 1st  row Ends-->
+                                <script type="text/javascript">
+                                    function toggle_status(incident_status, incident_id){
+                                        $('[name=incident_status]').val(incident_status);
+                                        $('[name=incident_id]').val(incident_id);
+                                        $('#toggle_status').submit();
+                                    }
+                                    function search_element_form(search_term){
+                                        $('[name=search_term]').val(search_term);
+                                        $('#search_element').submit();
+                                    }
+                                    function search_suppression(eventid, element){
+                                        console.log(eventid + ' ' + element);
+                                        $('[name=eventid]').val(eventid);
+                                        $('[name=element]').val(element);
+{#                                        $('#eventid').val(eventid);#}
+                                        $('#search_suppression').submit()
+                                    }
+                                </script>
+                         </tbody></table>
+    </div>
+
+
+                                <form method="post" id="toggle_status" action="/incidents/toggle/" accept-charset="."> {% csrf_token %}
+                                    <input type="hidden" name="incident_id" value="">
+                                    <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+                                    <input type="hidden" name="incident_status" value="">
+                                </form>
+                                <form method="post" id="search_element" action="/incidents/search/element/" accept-charset="."> {% csrf_token %}
+                                    <input type="hidden" name="search_term" value="">
+                                </form>
+                                <form method="post" id="search_suppression" action="/suppression/view/" accept-charset="."> {% csrf_token %}
+                                    <input type="hidden" name="eventid" value="" id="eventid">
+                                    <input type="hidden" name="element" value="" id="element">
+                                </form>
+
+
+<!-- Pagination start here -->
+                <div class="dataTables_paginate paging_bootstrap pagination">
+                    <ul>
+                        {% if incidents.has_previous %}
+                        <li class="prev">
+                            <a href="?page={{ incidents.previous_page_number }}">← Previous</a>
+                        </li>
+                        {% else %}
+                       <li class="prev disabled">
+                            <a href="#">← Previous</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="active">
+                            <a href="#">Page {{ incidents.number }} of {{ incidents.paginator.num_pages }}.</a>
+                        </li>
+
+                        {% if incidents.has_next %}
+                        <li class="next">
+                            <a href="?page={{ incidents.next_page_number }}">Next → </a>
+                        </li>
+                        {% else %}
+                        <li class="next disabled">
+                            <a href="#">Next → </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+   <!-- Pagination ends here -->
+</div>
+</div> <!-- container -->
+
+{% include 'footer.html' %}

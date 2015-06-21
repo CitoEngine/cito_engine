@@ -19,5 +19,5 @@ coverage.xml
 */.DS_Store
 .DS_Store
 *_dev_settings.py
-*.log
+logs/*
 .vagrant/

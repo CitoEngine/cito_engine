@@ -1,0 +1,100 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+    {% include 'noscript.html' %}
+
+<div class="container-fluid span12">
+
+    <div class="box">
+        <div class="box-content">
+            <form class="form-horizontal" method="POST" accept-charset="."> {% csrf_token %}
+            {% for field in search_form.visible_fields %}
+                      {{ field.label }}
+                          {{ field }}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary btn-small">Search</button>
+            </form>
+        </div>
+    </div>
+
+    {% if search_term %}
+    <div class="box ">
+    <div class="box-header well">
+        <h2><i class="icon-info-sign"></i>There are {{ incidents.count }} active/acknowledged incident(s) for elements matching: {{ search_term }}</h2>
+    </div>
+    <div class="box-content">
+                <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+                                 <thead>
+								  <tr>
+                                      <th>Severity</th>
+									  <th>Incident ID</th>
+									  <th>[EventID] Summary</th>
+									  <th>Element</th>
+									  <th>First Occurence</th>
+									  <th>Last Occurence</th>
+									  <th>Count</th>
+									  <th>Category</th>
+									  <th>Team</th>
+									  <th>Assignee</th>
+                                      <th>&nbsp;</th>
+								  </tr>
+							  </thead>
+							  <tbody>
+
+                                <form method="post" id="toggle_status" action="/incidents/toggle/" accept-charset="."> {% csrf_token %}
+                                    <input type="hidden" name="incident_id" value="">
+                                    <input type="hidden" name="redirect_to" value="/incidents/view/{{ i.event.team }}/active/">
+                                    <input type="hidden" name="incident_status" value="">
+                                <!-- Table 1st row -->
+                                {% for i in incidents %}
+                                    <tr>
+                                    <td>{{ i.event.severity }}</td>
+                                    <td><div class="btn-group"><a class="btn btn-info btn-mini" href="/incidents/view/{{ i.id }}"><i class="icon-list"></i>View {{ i.id }}</a></div>
+                                    <td>[<a href="/events/view/{{ i.event.id }}">{{ i.event.id }}</a>] {{ i.event.summary }}</td>
+                                    <td>{{ i.element }}</td>
+                                    <td>{{ i.firstEventTime|date:"M d, Y, H:i" }}</td>
+                                    <td>{{ i.lastEventTime|date:"M d, Y, H:i"  }}</td>
+                                    <td>{{ i.total_incidents }}</td>
+                                    <td>{{ i.event.category }}</td>
+                                    <td>{{ i.event.team }}</td>
+                                    <td>{{ i.acknowledged_by }}</td>
+                                    <td>
+
+
+                                        {% if i.status == 'Active' %}
+                                            <input type="button" class="btn btn-info btn-small" value="Ack" name="toggle_submit" onclick="javascript:toggle_status('Acknowledged', {{ i.id }});">
+                                            <input type="button" class="btn btn-success btn-small" value="Clear" name="toggle_submit" onclick="javascript:toggle_status('Cleared', {{ i.id }});">
+                                        {% elif i.status == 'Acknowledged' %}
+                                            <input type="button" class="btn btn-success btn-small" value="Clear" name="toggle_submit" onclick="javascript:toggle_status('Cleared', {{ i.id }});">
+                                        {% else %}
+                                            <span class="label label-info">Cleared</span>
+                                        {% endif %}
+
+
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                                                        <!-- Table 1st  row Ends-->
+                                </form>
+                                <script type="text/javascript">
+                                    function toggle_status(incident_status, incident_id){
+                                        $('[name=incident_status]').val(incident_status);
+                                        $('[name=incident_id]').val(incident_id);
+                                        $('[name=redirect_to]').val("/incidents/view/"+incident_id);
+                                        $('#toggle_status').submit();
+                                    }
+                                    console.log($)
+                                </script>
+                         </tbody></table>
+    <form class="form-horizontal" method="POST" accept-charset="." action="/reports/elements/incidents/"> {% csrf_token %}
+            <input type="hidden" name="element" value="{{ search_term }}">
+            <input type="hidden" name="timerange" value="7">
+            <input type="hidden" name="result_limit" value="25">
+            <button type="submit" class="btn btn-primary btn-small">Click here to view past alerts for {{ search_term }}</button>
+            </form>
+    </div>
+
+    {% endif %}
+
+
+</div>
+{% include 'footer.html' %}
