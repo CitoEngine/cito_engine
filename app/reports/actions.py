@@ -59,6 +59,31 @@ def get_report_all_incidents(days, event_id=None, team_id=None, severity=None):
         query['day__gte'] = time_range
         return DailyData.objects.filter(**query)
 
+def get_detailed_report_of_all_incidents(days, event_id=None, team_id=None, severity=None):
+    query = dict()
+    time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
+    if team_id is not None:
+        query['event__team__id'] = team_id
+    if event_id is not None:
+        query['event_id'] = event_id
+    if severity != 'All' and severity is not None:
+        query['severity'] = severity
+    query['lastEventTime__gte'] = time_range
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="citoengine_report.csv"'
+    writer = csv.writer(response)
+    report_header = ['severity', 'incident_id', 'event_id', 'event_summary', 'element',
+                     'firstoccurence', 'lastoccurence', 'total_count', 'team', 'category',
+                     'acknowledged_time', 'close_time', 'acknowledged_by', 'closed_by', 'is_suppressed']
+    writer.writerow(report_header)
+    for i in Incident.objects.filter(**query):
+        writer.writerow([i.event.severity, i.id, i.event.id, i.event.summary, i.element,
+                         i.firstEventTime, i.lastEventTime, i.total_incidents, i.event.team, i.event.category,
+                         i.acknowledged_time, i.close_time, i.acknowledged_by, i.closed_by, i.is_suppressed])
+
+    return response
+
+
 
 def get_report_json_formatter(data, dimension):
     response = dict()

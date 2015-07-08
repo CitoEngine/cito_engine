@@ -54,9 +54,10 @@ def report_all_incidents(request):
                 dimension = 'hour'
             else:
                 dimension = 'day'
-            result = actions.get_report_all_incidents(timerange, **query_params)
             if form.cleaned_data.get('csv_export'):
-                return actions.get_report_csv_formatter(result, dimension)
+                return actions.get_detailed_report_of_all_incidents(timerange, **query_params)
+            else:
+                result = actions.get_report_all_incidents(timerange, **query_params)
             render_vars['json_data'] = actions.get_report_json_formatter(result, dimension)
             render_vars['page_title'] = 'Incidents for %s ' % render_vars['series_label']
             if query_params['severity'] == 'All':
@@ -70,7 +71,6 @@ def report_all_incidents(request):
         render_vars['page_title'] = 'Select one or more options to generate the report.'
         render_vars['nothing_selected'] = True
     return render_to_response('reports_all_incidents.html', render_vars, context_instance=RequestContext(request))
-
 
 @login_required(login_url='/login/')
 def report_events_in_system(request):
