@@ -158,8 +158,7 @@ POLLER_CONFIG['interval'] = int(conf.get('POLLER', 'INTERVAL'))
 POLLER_CONFIG['batchsize'] = int(conf.get('POLLER', 'BATCHSIZE'))
 POLLER_CONFIG['visibility'] = int(conf.get('POLLER', 'VISIBILITY'))
 
-JIRA_OPTS = dict()
-JIRA_ENABLED = False
+# Parse JIRA opts
 try:
     if conf.get('JIRA_OPTS', 'JIRA_ENABLED').lower() == 'true':
         JIRA_ENABLED = True
