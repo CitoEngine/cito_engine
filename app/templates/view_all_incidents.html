@@ -60,7 +60,10 @@
                                       {% if incident_status != 'active' %}
 									  <th>Assignee</th>
                                       {% endif %}
-                                      <th>&nbsp;</th>
+                                      <th>Action</th>
+                                  {% if jira_enabled %}
+                                      <th>JIRA</th>
+                                  {% endif %}
 								  </tr>
 							  </thead>
 							  <tbody>
@@ -106,6 +109,13 @@
 
 
                                     </td>
+                                    {% if jira_enabled %}
+                                    <td>
+                                        {% for j in i.jiratickets_set.all %}
+                                            <a href="{{ jira_url }}{{ j.ticket }}">{{ j.ticket }}</a>
+                                        {% endfor %}
+                                    </td>
+                                    {% endif %}
                                     </tr>
                                 {% endfor %}
                                                         <!-- Table 1st  row Ends-->

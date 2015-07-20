@@ -16,9 +16,6 @@ limitations under the License.
 from django.db import models
 from django.contrib.auth.models import User
 
-# ./manage.py schemamigration cito_engine --auto
-# ./manage.py migrate cito_engine
-
 
 class PluginServer(models.Model):
     name = models.CharField(max_length=128)
@@ -230,3 +227,12 @@ class EventActionLog(models.Model):
 
     def __unicode__(self):
         return unicode('%s|%s' % (self.eventAction, self.dateAdded))
+
+class JIRATickets(models.Model):
+    incident = models.ForeignKey(Incident)
+    user = models.ForeignKey(User)
+    ticket = models.CharField(verbose_name='JIRA Ticket ID', max_length=64)
+    creation_time = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return unicode('%s' % self.ticket)

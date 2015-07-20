@@ -158,6 +158,23 @@ POLLER_CONFIG['interval'] = int(conf.get('POLLER', 'INTERVAL'))
 POLLER_CONFIG['batchsize'] = int(conf.get('POLLER', 'BATCHSIZE'))
 POLLER_CONFIG['visibility'] = int(conf.get('POLLER', 'VISIBILITY'))
 
+JIRA_OPTS = dict()
+JIRA_ENABLED = False
+try:
+    if conf.get('JIRA_OPTS', 'JIRA_ENABLED').lower() == 'true':
+        JIRA_ENABLED = True
+        JIRA_OPTS['URL'] = conf.get('JIRA_OPTS', 'JIRA_URL')
+        JIRA_OPTS['USER'] = conf.get('JIRA_OPTS', 'JIRA_USER')
+        JIRA_OPTS['PASSWORD'] = conf.get('JIRA_OPTS', 'JIRA_PASSWORD')
+        JIRA_OPTS['DEFAULT_PROJECT'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_PROJECT')
+        JIRA_OPTS['DEFAULT_ISSUE_TYPE'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_ISSUE_TYPE')
+        # Double check if all JIRA parameters came through
+        for k in ['URL', 'USER', 'PASSWORD', 'DEFAULT_PROJECT', 'DEFAULT_ISSUE_TYPE']:
+            if not JIRA_OPTS.get(k):
+                raise ImproperlyConfigured('JIRA integeration is enabled but JIRA_%s value is missing' % k)
+except ConfigParser.NoSectionError:
+    pass
+
 # if conf.has_section('DEVELOPMENT'):
 #     try:
 #         if conf.getboolean('DEVELOPMENT', 'DEVMODE'):

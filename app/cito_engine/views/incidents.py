@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -21,7 +22,7 @@ from django.template import RequestContext
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.http import Http404
 from django.utils import timezone
-from cito_engine.models import EventActionLog, Incident, IncidentLog, Team
+from cito_engine.models import EventActionLog, Incident, IncidentLog, Team, JIRATickets
 from cito_engine.forms import incidents
 from comments.models import Comments
 from comments.forms import CommentsForm
@@ -78,6 +79,10 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
 
     render_vars['box_title'] = render_vars['page_title']
     render_vars['auto_refresh_page'] = True
+    # JIRA stuff
+    if settings.JIRA_ENABLED:
+        render_vars['jira_enabled'] = True
+        render_vars['jira_url'] = '%s/browse/' % settings.JIRA_OPTS['URL']
     return render_to_response('view_all_incidents.html', render_vars, context_instance=RequestContext(request))
 
 
@@ -86,6 +91,15 @@ def view_single_incident(request, incident_id):
     if request.user.perms.access_level > 4:
         return render_to_response('unauthorized.html', context_instance=RequestContext(request))
     incident = get_object_or_404(Incident, pk=incident_id)
+    if settings.JIRA_ENABLED:
+        jira_enabled = True
+        jira_url = '%s/browse/' % settings.JIRA_OPTS.get('URL')
+        jira_default_project = settings.JIRA_OPTS.get('DEFAULT_PROJECT')
+        jira_default_issue_type = settings.JIRA_OPTS.get('DEFAULT_ISSUE_TYPE')
+        try:
+            jira = JIRATickets.objects.get(incident=incident)
+        except Exception as e:
+            pass
     incidentlogs = IncidentLog.objects.filter(incident=incident).order_by('timestamp')
     eventactionlogs = EventActionLog.objects.filter(incident=incident).order_by('dateAdded')
     comments = Comments.objects.filter(incident=incident).order_by('date_added')

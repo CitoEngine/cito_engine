@@ -15,6 +15,7 @@ limitations under the License.
 
 import csv
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.db.models import Count, Sum
 from django.utils import timezone
 from django.http import HttpResponse
@@ -72,15 +73,29 @@ def get_detailed_report_of_all_incidents(days, event_id=None, team_id=None, seve
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="citoengine_report.csv"'
     writer = csv.writer(response)
+
     report_header = ['severity', 'incident_id', 'event_id', 'event_summary', 'element',
                      'firstoccurence', 'lastoccurence', 'total_count', 'team', 'category',
                      'acknowledged_time', 'close_time', 'acknowledged_by', 'closed_by', 'is_suppressed']
+    if settings.JIRA_ENABLED:
+        report_header.append('jira_ticket')
+        report_header.append('jira_creation_time')
+        report_header.append('jira_created_by')
+
     writer.writerow(report_header)
     for i in Incident.objects.filter(**query):
-        writer.writerow([i.event.severity, i.id, i.event.id, i.event.summary, i.element,
-                         i.firstEventTime, i.lastEventTime, i.total_incidents, i.event.team, i.event.category,
-                         i.acknowledged_time, i.close_time, i.acknowledged_by, i.closed_by, i.is_suppressed])
+        csv_row = [i.event.severity, i.id, i.event.id, i.event.summary, i.element,
+                   i.firstEventTime, i.lastEventTime, i.total_incidents, i.event.team, i.event.category,
+                   i.acknowledged_time, i.close_time, i.acknowledged_by, i.closed_by, i.is_suppressed]
+        if settings.JIRA_ENABLED:
+            # Only one jira is allowed per incident, hence we fetch only one jiraticket
+            jira = i.jiratickets_set.last()
+            if jira:
+                csv_row.append(jira.ticket)
+                csv_row.append(jira.creation_time)
+                csv_row.append(jira.user.username)
 
+        writer.writerow(csv_row)
     return response
 
 

@@ -21,6 +21,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from api.incident_listener import IncidentListenerAPI
 from rules_engine.views import SuppressionSearchView, SuppressionAddView, RemoveSuppression
+from cito_engine.views.jira import JIRAAddView
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -54,6 +55,12 @@ urlpatterns += patterns('',
                         url(r'^incidents/toggle/$', 'cito_engine.views.incidents.toggle_incident_status'),
                         url(r'^incidents/search/element/$', 'cito_engine.views.incidents.view_element'),
                         )
+
+
+urlpatterns += patterns('',
+                        url(r'^jira/add/$', JIRAAddView.as_view()),
+                        )
+
 urlpatterns += patterns('',
                         url(r'^comments/add/$', 'comments.views.add_comment'),
                         )
