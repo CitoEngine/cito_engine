@@ -113,6 +113,12 @@ JIRA_DEFAULT_PROJECT = TEST
 # Default JIRA Type (case sensitive)
 JIRA_DEFAULT_ISSUE_TYPE = Task
 
+# Default JIRA component
+JIRA_DEFAULT_COMPONENT =
+
+# To enable, set it to True else keep as False
+JIRA_VERIFY_SSL = True
+
 
 #####################################################################
 #

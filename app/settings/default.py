@@ -164,9 +164,11 @@ try:
         JIRA_ENABLED = True
         JIRA_OPTS['URL'] = conf.get('JIRA_OPTS', 'JIRA_URL')
         JIRA_OPTS['USER'] = conf.get('JIRA_OPTS', 'JIRA_USER')
+        JIRA_OPTS['JIRA_VERIFY_SSL'] = conf.get('JIRA_OPTS', 'JIRA_VERIFY_SSL')
         JIRA_OPTS['PASSWORD'] = conf.get('JIRA_OPTS', 'JIRA_PASSWORD')
         JIRA_OPTS['DEFAULT_PROJECT'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_PROJECT')
         JIRA_OPTS['DEFAULT_ISSUE_TYPE'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_ISSUE_TYPE')
+        JIRA_OPTS['DEFAULT_COMPONENT'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_COMPONENT')
         # Double check if all JIRA parameters came through
         for k in ['URL', 'USER', 'PASSWORD', 'DEFAULT_PROJECT', 'DEFAULT_ISSUE_TYPE']:
             if not JIRA_OPTS.get(k):

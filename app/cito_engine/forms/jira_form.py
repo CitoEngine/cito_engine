@@ -14,6 +14,7 @@ class JIRAForm(forms.Form):
     summary = forms.CharField(label='Ticket Summary', max_length=100)
     description = forms.CharField(widget=forms.Textarea)
     issue_type = forms.CharField(label='Issue Type', initial='Task', max_length=100)
+    component = forms.CharField(label='Component', max_length=100)
     incident_id = forms.IntegerField()
     confirm = forms.BooleanField(label='Confirm', required=True)
 
@@ -23,11 +24,13 @@ class JIRAForm(forms.Form):
 
     def create_jira(self, username):
         options = {
-            'server': '%s' % settings.JIRA_OPTS['URL']
+            'server': '%s' % settings.JIRA_OPTS['URL'],
+            'verify': settings.JIRA_OPTS.get('VERIFY_SSL', False)
         }
         project = self.cleaned_data.get('project')
         summary = self.cleaned_data.get('summary')
         issue_type = self.cleaned_data.get('issue_type')
+        component = self.cleaned_data.get('component')
         description = self.cleaned_data.get('description')
         description += '*JIRA Created by:* %s' % username
 
@@ -39,7 +42,7 @@ class JIRAForm(forms.Form):
 
         try:
             jira_ticket = jconn.create_issue(project=project, summary=summary, description=description,
-                                             issuetype={'name': issue_type})
+                                             issuetype={'name': issue_type}, components=[{'name': component}])
         except Exception as e:
             logger.error('Error creating JIRA ticket project=%s, summary=%s,  issue_type=%s, description=%s,' % (project,
                                                                                                                summary,
