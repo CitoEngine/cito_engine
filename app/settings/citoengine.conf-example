@@ -104,17 +104,17 @@ JIRA_USER = jira-user
 # JIRA Password
 JIRA_PASSWORD = jira-password
 
-# Your JIRA FQDN without trailing slashes
+# Your JIRA FQDN without trailing slash
 JIRA_URL = https://example.atlassian.net
 
-# Default JIRA Project (case sensitive)
-JIRA_DEFAULT_PROJECT = TEST
+# Comma separated list of JIRA projects (case sensitive)
+JIRA_PROJECTS = TEST, XFILES
 
-# Default JIRA Type (case sensitive)
-JIRA_DEFAULT_ISSUE_TYPE = Task
+# Comma separated list of JIRA Types (case sensitive)
+JIRA_ISSUE_TYPES = Task, Bug
 
-# Default JIRA component
-JIRA_DEFAULT_COMPONENT =
+# Comma separated list of JIRA components (case sensitive)
+JIRA_COMPONENTS = Foo, Bar
 
 # To enable, set it to True else keep as False
 JIRA_VERIFY_SSL = True

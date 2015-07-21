@@ -10,17 +10,34 @@ logger = logging.getLogger('main')
 
 
 class JIRAForm(forms.Form):
-    project = forms.CharField(label='JIRA Project', max_length=100)
+
+    project = forms.ChoiceField(label='JIRA Project', required=True)
     summary = forms.CharField(label='Ticket Summary', max_length=100)
     description = forms.CharField(widget=forms.Textarea)
-    issue_type = forms.CharField(label='Issue Type', initial='Task', max_length=100)
-    component = forms.CharField(label='Component', max_length=100)
+    issue_type = forms.ChoiceField(label='Issue Type', required=True)
+    component = forms.ChoiceField(label='Component', required=True)
     incident_id = forms.IntegerField()
     confirm = forms.BooleanField(label='Confirm', required=True)
 
-    # def __init__(self, *args, **kwargs):
-    #     super(JIRAForm, self).__init(*args, **kwargs)
-    #     # self.fields['project']
+    def get_choice_fields(self, opt):
+        opt_string = settings.JIRA_OPTS.get(opt)
+        if ',' in opt_string:
+            opt_string = opt_string.split(',')
+        else:
+            opt_string = [opt_string]
+
+        CHOICES = []
+        for p in opt_string:
+            CHOICES.append([p.strip(), p.strip()])
+
+        return CHOICES
+
+    def __init__(self, *args, **kwargs):
+        super(JIRAForm, self).__init__(*args, **kwargs)
+        # Create choicefield for projects
+        self.fields['project'].choices = self.get_choice_fields('PROJECTS')
+        self.fields['component'].choices = self.get_choice_fields('COMPONENTS')
+        self.fields['issue_type'].choices = self.get_choice_fields('ISSUE_TYPES')
 
     def create_jira(self, username):
         options = {

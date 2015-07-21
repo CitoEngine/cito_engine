@@ -166,11 +166,11 @@ try:
         JIRA_OPTS['USER'] = conf.get('JIRA_OPTS', 'JIRA_USER')
         JIRA_OPTS['JIRA_VERIFY_SSL'] = conf.get('JIRA_OPTS', 'JIRA_VERIFY_SSL')
         JIRA_OPTS['PASSWORD'] = conf.get('JIRA_OPTS', 'JIRA_PASSWORD')
-        JIRA_OPTS['DEFAULT_PROJECT'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_PROJECT')
-        JIRA_OPTS['DEFAULT_ISSUE_TYPE'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_ISSUE_TYPE')
-        JIRA_OPTS['DEFAULT_COMPONENT'] = conf.get('JIRA_OPTS', 'JIRA_DEFAULT_COMPONENT')
+        JIRA_OPTS['PROJECTS'] = conf.get('JIRA_OPTS', 'JIRA_PROJECTS')
+        JIRA_OPTS['ISSUE_TYPES'] = conf.get('JIRA_OPTS', 'JIRA_ISSUE_TYPES')
+        JIRA_OPTS['COMPONENTS'] = conf.get('JIRA_OPTS', 'JIRA_COMPONENTS')
         # Double check if all JIRA parameters came through
-        for k in ['URL', 'USER', 'PASSWORD', 'DEFAULT_PROJECT', 'DEFAULT_ISSUE_TYPE']:
+        for k in ['URL', 'USER', 'PASSWORD', 'PROJECTS', 'ISSUE_TYPES', 'COMPONENTS']:
             if not JIRA_OPTS.get(k):
                 raise ImproperlyConfigured('JIRA integeration is enabled but JIRA_%s value is missing' % k)
 except ConfigParser.NoSectionError:

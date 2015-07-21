@@ -94,9 +94,6 @@ def view_single_incident(request, incident_id):
     if settings.JIRA_ENABLED:
         jira_enabled = True
         jira_url = '%s/browse/' % settings.JIRA_OPTS.get('URL')
-        jira_default_project = settings.JIRA_OPTS.get('DEFAULT_PROJECT')
-        jira_default_issue_type = settings.JIRA_OPTS.get('DEFAULT_ISSUE_TYPE')
-        jira_default_component = settings.JIRA_OPTS.get('DEFAULT_COMPONENT')
         try:
             jira = JIRATickets.objects.get(incident=incident)
         except Exception as e:

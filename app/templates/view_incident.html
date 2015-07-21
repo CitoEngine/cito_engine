@@ -88,10 +88,7 @@
                                                         {% else %}
                                                             <td colspan="3">
                                                                 <form method="post" id="search_suppression" action="/jira/add/" accept-charset="."> {% csrf_token %}
-                                                                <input type="hidden" name="project" value="{{ jira_default_project }}" id="eventid">
                                                                 <input type="hidden" name="incident_id" value="{{ incident.id }}" id="eventid">
-                                                                <input type="hidden" name="issue_type" value="{{ jira_default_issue_type }}" id="eventid">
-                                                                <input type="hidden" name="component" value="{{ jira_default_component }}" id="eventid">
                                                                 <input type="hidden" name="summary" value="IncidentID:{{ incident.id }}, {{ incident.event.summary }} - {{ incident.element }}" id="element">
                                                                 <input type="hidden" name="description" value="
 *IncidentID:* {{ incident.id }}

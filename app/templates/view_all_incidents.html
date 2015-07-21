@@ -110,11 +110,15 @@
 
                                     </td>
                                     {% if jira_enabled %}
-                                    <td>
-                                        {% for j in i.jiratickets_set.all %}
-                                            <a href="{{ jira_url }}{{ j.ticket }}">{{ j.ticket }}</a>
-                                        {% endfor %}
-                                    </td>
+                                        <td>
+                                            {% if i.jiratickets_set.all|length > 0 %}
+                                                {% for j in i.jiratickets_set.all %}
+                                                    <a href="{{ jira_url }}{{ j.ticket }}">{{ j.ticket }}</a>
+                                                {% endfor %}
+                                            {% else %}
+                                            <div align="center">-</div>
+                                            {% endif %}
+                                        </td>
                                     {% endif %}
                                     </tr>
                                 {% endfor %}
