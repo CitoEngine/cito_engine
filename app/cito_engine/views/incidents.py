@@ -42,6 +42,17 @@ def get_incident_stats(team_id=None):
     return stats
 
 
+def parse_order_by(order_by):
+    ordering_list = dict(a_fe='firstEventTime',
+                         a_le='lastEventTime',
+                         a_count='total_incidents',
+                         d_fe='-firstEventTime',
+                         d_le='-lastEventTime',
+                         d_count='-total_incidents',
+                         )
+
+    return ordering_list.get(order_by, None)
+
 @login_required(login_url='/login/')
 def view_all_incidents(request, team_id=None, incident_status='active'):
     if request.user.perms.access_level > 4:
@@ -54,6 +65,8 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
     render_vars['incident_status'] = incident_status
     query_params['status__iexact'] = incident_status
 
+    order_by = parse_order_by(request.GET.get('order_by'))
+
     if not team_id:
         render_vars['stats'] = get_incident_stats()
         render_vars['redirect_to'] = '/incidents/view/%s' % incident_status
@@ -65,7 +78,11 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
         render_vars['redirect_to'] = '/incidents/view/%s/%s' % (team_id, incident_status)
         render_vars['team'] = team
 
-    incident_list = Incident.objects.filter(**query_params)
+    if order_by:
+        incident_list = Incident.objects.filter(**query_params).order_by(order_by)
+        render_vars['order_by'] = request.GET.get('order_by')
+    else:
+        incident_list = Incident.objects.filter(**query_params)
     # TODO: Convert 'Pages per result' into global and user setting
     paginator = Paginator(incident_list, 25)
     try:
