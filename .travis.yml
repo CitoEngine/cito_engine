@@ -19,3 +19,5 @@ after_success:
 notifications:
   email:
     - sysadmin@citoengine.org
+
+sudo: false
