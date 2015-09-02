@@ -252,5 +252,9 @@ Incident cleared at *{{ incident.close_time }}* by *{{ incident.closed_by }}*
                             </div> <!-- tabs /-->
      </div><!--incident logs -->
 </div> <!-- container -->
-
+<script>
+$('input[type=submit]').click(function() {
+    $(this).attr('disabled', 'disabled');
+    $(this).parents('form').submit()
+})</script>
 {% include 'footer.html' %}
