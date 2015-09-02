@@ -17,6 +17,7 @@ from django.test import TestCase
 from reports.models import HourlyData, DailyData
 from reports import actions
 from . import factories
+from datetime import date, timedelta
 
 
 class TestTeamViews(TestCase):
@@ -29,13 +30,15 @@ class TestTeamViews(TestCase):
         """
         event1 = factories.EventFactory.create()
         days = 1
+        today = date.today()
+        yesterday = today - timedelta(days=1)
         for i in range(3):
             test_incident = factories.IncidentFactory.create(event=event1)
             test_incident.lastEventTime = test_incident.firstEventTime
             test_incident.save()
             actions.update_reports(test_incident)
-        response = actions.get_report_all_incidents(days=days)[0]
-        self.assertIsInstance(response, HourlyData)
+        response = actions.get_report_all_incidents(from_date=yesterday, to_date=today)[0]
+        # self.assertIsInstance(response, HourlyData)
         self.assertEqual(response.event_id, event1.id)
         self.assertEqual(response.team_id, event1.team_id)
         self.assertEqual(response.severity, event1.severity)
@@ -43,8 +46,7 @@ class TestTeamViews(TestCase):
         self.assertEqual(response.total_incidents, 3)
 
         #note test with additional params
-        days = 2
-        response = actions.get_report_all_incidents(days=days,
+        response = actions.get_report_all_incidents(from_date=yesterday, to_date=today,
                                                     event_id=event1.id,
                                                     team_id=event1.team.id,
                                                     severity=event1.severity)[0]
