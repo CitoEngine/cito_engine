@@ -14,15 +14,12 @@ limitations under the License.
 """
 
 from django.forms import Form, ChoiceField, IntegerField, BooleanField, CharField
+from datetime import datetime
 from cito_engine.models import Team
 
 
 class AllIncidentsReportForm(Form):
-    time_choices = (
-        ('1', 'Last 24hours'),
-        ('7', 'Last week'),
-        ('30', '4 weeks'),
-    )
+
     status_choices = (
         (u'All', u'All'),
         (u'Active', u'Active'),
@@ -38,7 +35,8 @@ class AllIncidentsReportForm(Form):
     )
 
     team = ChoiceField(label="Team")
-    timerange = ChoiceField(choices=time_choices, label="Range")
+    from_date = CharField(label="From")
+    to_date = CharField(label="To")
     severity = ChoiceField(choices=event_severity, label='Severity')
     csv_export = BooleanField(label="Export as CSV", required=False)
 
@@ -49,6 +47,21 @@ class AllIncidentsReportForm(Form):
             self.team_list.append((team.id, team.name))
         self.fields['team'].choices = self.team_list
 
+    def clean(self):
+        cleaned_data = super(AllIncidentsReportForm, self).clean()
+        from_date = cleaned_data.get('from_date')
+        to_date = cleaned_data.get('to_date')
+        try:
+            datetime.strptime(from_date, '%Y-%m-%d')
+        except Exception as e:
+            self._errors["from_date"] = self.error_class(['Invalid date'])
+
+        try:
+            datetime.strptime(to_date, '%Y-%m-%d')
+        except Exception as e:
+            self._errors["to_date"] = self.error_class(['Invalid date'])
+
+        return cleaned_data
 
 
 class EventsPerTeam(Form):

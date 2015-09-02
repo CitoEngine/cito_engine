@@ -44,32 +44,34 @@ def update_reports(incident):
     daily_data.save()
 
 
-def get_report_all_incidents(days, event_id=None, team_id=None, severity=None):
+def get_report_all_incidents(from_date, to_date, event_id=None, team_id=None, severity=None):
     query = dict()
-    time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
     if team_id is not None:
         query['team_id'] = team_id
     if event_id is not None:
         query['event_id'] = event_id
     if severity != 'All' and severity is not None:
         query['severity'] = severity
-    if days == 1:
-        query['hour__gte'] = time_range
-        return HourlyData.objects.filter(**query)
-    else:
-        query['day__gte'] = time_range
-        return DailyData.objects.filter(**query)
 
-def get_detailed_report_of_all_incidents(days, event_id=None, team_id=None, severity=None):
+    query['day__gte'] = from_date
+    query['day__lte'] = to_date
+
+    return DailyData.objects.filter(**query)
+
+def get_detailed_report_of_all_incidents(from_date, to_date, event_id=None, team_id=None, severity=None):
     query = dict()
-    time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
+    # time_range = timezone.make_aware(datetime.today() - timedelta(days=days), timezone.get_current_timezone())
+
     if team_id is not None:
         query['event__team__id'] = team_id
     if event_id is not None:
         query['event_id'] = event_id
     if severity != 'All' and severity is not None:
         query['severity'] = severity
-    query['lastEventTime__gte'] = time_range
+
+    query['lastEventTime__gte'] = from_date
+    query['lastEventTime__lte'] = to_date
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="citoengine_report.csv"'
     writer = csv.writer(response)

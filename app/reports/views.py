@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from datetime import datetime
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
@@ -24,8 +25,9 @@ from .forms import AllIncidentsReportForm, EventsPerTeam, MostAlertedElements, I
 def report_all_incidents(request):
     js_list = ['flot/jquery.flot.min.js',
                'flot/jquery.flot.time.min.js',
+               'jquery-ui.js'
     ]
-    css_list = None
+    css_list = ['jquery-ui.css']
     form = AllIncidentsReportForm()
     render_vars = {'js_list': js_list,
                    'css_list': css_list,
@@ -40,8 +42,13 @@ def report_all_incidents(request):
             query_params = dict()
             query_params['team_id'] = None
             team_id = int(form.cleaned_data.get('team'))
-            timerange = int(form.cleaned_data.get('timerange'))
+            # timerange = int(form.cleaned_data.get('timerange'))
+            raw_from_date = form.cleaned_data.get('from_date')
+            raw_to_date = form.cleaned_data.get('to_date')
             query_params['severity'] = form.cleaned_data.get('severity')
+
+            from_date = datetime.strptime(raw_from_date, '%Y-%m-%d')
+            to_date = datetime.strptime(raw_to_date, '%Y-%m-%d')
 
             if team_id > 0:
                 team = get_object_or_404(Team, pk=team_id)
@@ -50,23 +57,24 @@ def report_all_incidents(request):
             else:
                 render_vars['series_label'] = 'All teams'
 
-            if timerange == 1:
-                dimension = 'hour'
-            else:
-                dimension = 'day'
             if form.cleaned_data.get('csv_export'):
-                return actions.get_detailed_report_of_all_incidents(timerange, **query_params)
+                return actions.get_detailed_report_of_all_incidents(from_date=from_date,
+                                                                    to_date=to_date,
+                                                                    **query_params)
             else:
-                result = actions.get_report_all_incidents(timerange, **query_params)
-            render_vars['json_data'] = actions.get_report_json_formatter(result, dimension)
+                result = actions.get_report_all_incidents(from_date=from_date,
+                                                          to_date=to_date,**query_params)
+
+
+                render_vars['json_data'] = actions.get_report_json_formatter(result, dimension='day')
+
             render_vars['page_title'] = 'Incidents for %s ' % render_vars['series_label']
+            render_vars['from_date'] = raw_from_date
+            render_vars['to_date'] = raw_to_date
             if query_params['severity'] == 'All':
                 render_vars['page_title'] += ' with any severity.'
             else:
                 render_vars['page_title'] += ' with %s severity.' % query_params['severity']
-        else:
-            raise ValueError
-
     else:
         render_vars['page_title'] = 'Select one or more options to generate the report.'
         render_vars['nothing_selected'] = True
