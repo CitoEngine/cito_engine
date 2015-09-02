@@ -14,6 +14,7 @@
                       {{ field.label }}
                           {{ field }}
             {% endfor %}
+            <p></p>
             <button type="submit" class="btn btn-primary btn-small">Get report</button>
             </form>
         </div>
@@ -24,6 +25,20 @@
         </div>
     </div>
     {% endif %}
+  <script>
+  $(function() {
+    $( "#id_from_date" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        showButtonPanel: true,
+        showAnim: "slideDown"
+    });
+      $( "#id_to_date" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        showButtonPanel: true,
+        showAnim: "slideDown"
+    });
+  });
+  </script>
 </div> <!-- container -->
 
 {% include 'footer.html' %}

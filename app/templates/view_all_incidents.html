@@ -47,20 +47,23 @@
                 <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
                                  <thead>
 								  <tr>
-                                      <th>Severity</th>
+                                     <th>Severity</th>
 									  <th>Incident ID</th>
 									  <th>[EventID] Summary</th>
 									  <th>Element</th>
-									  <th>First Occurence</th>
-									  <th>Last Occurence</th>
-									  <th>Count</th>
+									  <th><a href="?order_by={% if order_by == 'a_fe' %}d_fe{% else %}a_fe{% endif %}">First Occurence</a></th>
+									  <th><a href="?order_by={% if order_by == 'a_le' %}d_le{% else %}a_le{% endif %}">Last Occurence</a></th>
+									  <th><a href="?order_by={% if order_by == 'a_count' %}d_count{% else %}a_count{% endif %}">Count</a></th>
 									  <th>Suppressed?</th>
 									  <th>Category</th>
 									  <th>Team</th>
                                       {% if incident_status != 'active' %}
 									  <th>Assignee</th>
                                       {% endif %}
-                                      <th>&nbsp;</th>
+                                      <th>Action</th>
+                                  {% if jira_enabled %}
+                                      <th>JIRA</th>
+                                  {% endif %}
 								  </tr>
 							  </thead>
 							  <tbody>
@@ -106,6 +109,17 @@
 
 
                                     </td>
+                                    {% if jira_enabled %}
+                                        <td>
+                                            {% if i.jiratickets_set.all|length > 0 %}
+                                                {% for j in i.jiratickets_set.all %}
+                                                    <a href="{{ jira_url }}{{ j.ticket }}">{{ j.ticket }}</a>
+                                                {% endfor %}
+                                            {% else %}
+                                            <div align="center">-</div>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
                                     </tr>
                                 {% endfor %}
                                                         <!-- Table 1st  row Ends-->
@@ -148,9 +162,13 @@
 <!-- Pagination start here -->
                 <div class="dataTables_paginate paging_bootstrap pagination">
                     <ul>
+
                         {% if incidents.has_previous %}
                         <li class="prev">
-                            <a href="?page={{ incidents.previous_page_number }}">← Previous</a>
+                            <a href="?page=1{% if order_by %}&order_by={{ order_by }} {% endif %}">←← First</a>
+                        </li>
+                        <li class="prev">
+                            <a href="?page={{ incidents.previous_page_number }}{% if order_by %}&order_by={{ order_by }} {% endif %}">← Previous</a>
                         </li>
                         {% else %}
                        <li class="prev disabled">
@@ -164,13 +182,17 @@
 
                         {% if incidents.has_next %}
                         <li class="next">
-                            <a href="?page={{ incidents.next_page_number }}">Next → </a>
+                            <a href="?page={{ incidents.next_page_number }}{% if order_by %}&order_by={{ order_by }} {% endif %}">Next → </a>
+                        </li>
+                        <li class="next">
+                            <a href="?page={{ incidents.paginator.num_pages }}{% if order_by %}&order_by={{ order_by }} {% endif %}">Last →→ </a>
                         </li>
                         {% else %}
                         <li class="next disabled">
                             <a href="#">Next → </a>
                         </li>
                         {% endif %}
+
                     </ul>
                 </div>
    <!-- Pagination ends here -->

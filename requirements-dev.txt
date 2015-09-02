@@ -9,6 +9,7 @@ django-ipware==0.0.8
 factory-boy==2.3.1
 gevent
 gunicorn
+jira
 mock==1.0.1
 pika==0.9.13
 pytz==2013b

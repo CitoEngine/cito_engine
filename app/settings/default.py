@@ -158,6 +158,24 @@ POLLER_CONFIG['interval'] = int(conf.get('POLLER', 'INTERVAL'))
 POLLER_CONFIG['batchsize'] = int(conf.get('POLLER', 'BATCHSIZE'))
 POLLER_CONFIG['visibility'] = int(conf.get('POLLER', 'VISIBILITY'))
 
+# Parse JIRA opts
+try:
+    if conf.get('JIRA_OPTS', 'JIRA_ENABLED').lower() == 'true':
+        JIRA_ENABLED = True
+        JIRA_OPTS['URL'] = conf.get('JIRA_OPTS', 'JIRA_URL')
+        JIRA_OPTS['USER'] = conf.get('JIRA_OPTS', 'JIRA_USER')
+        JIRA_OPTS['JIRA_VERIFY_SSL'] = conf.get('JIRA_OPTS', 'JIRA_VERIFY_SSL')
+        JIRA_OPTS['PASSWORD'] = conf.get('JIRA_OPTS', 'JIRA_PASSWORD')
+        JIRA_OPTS['PROJECTS'] = conf.get('JIRA_OPTS', 'JIRA_PROJECTS')
+        JIRA_OPTS['ISSUE_TYPES'] = conf.get('JIRA_OPTS', 'JIRA_ISSUE_TYPES')
+        JIRA_OPTS['COMPONENTS'] = conf.get('JIRA_OPTS', 'JIRA_COMPONENTS')
+        # Double check if all JIRA parameters came through
+        for k in ['URL', 'USER', 'PASSWORD', 'PROJECTS', 'ISSUE_TYPES', 'COMPONENTS']:
+            if not JIRA_OPTS.get(k):
+                raise ImproperlyConfigured('JIRA integeration is enabled but JIRA_%s value is missing' % k)
+except ConfigParser.NoSectionError:
+    pass
+
 # if conf.has_section('DEVELOPMENT'):
 #     try:
 #         if conf.getboolean('DEVELOPMENT', 'DEVMODE'):

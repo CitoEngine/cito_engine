@@ -74,6 +74,53 @@
                                                                 {% else %} No {% endif %}
                                                             </td>
                                                         </tr>
+                                                        <tr>
+{#                                                        JIRA Stuff#}
+                                                        {% if jira_enabled %}
+                                                        <td>
+                                                            <strong>JIRA:</strong>
+                                                        </td>
+                                                        {% if jira %}
+                                                             <td colspan="4"><div >Ticket: <a href="{{ jira_url }}{{ jira.ticket }}">{{ jira.ticket }}</a>
+                                                              created by <strong>{{ jira.user.username }}</strong> at
+                                                              <strong> {{ jira.creation_time }}</strong>
+                                                              </td>
+                                                        {% else %}
+                                                            <td colspan="3">
+                                                                <form method="post" id="search_suppression" action="/jira/add/" accept-charset="."> {% csrf_token %}
+                                                                <input type="hidden" name="incident_id" value="{{ incident.id }}" id="eventid">
+                                                                <input type="hidden" name="summary" value="IncidentID:{{ incident.id }}, {{ incident.event.summary }} - {{ incident.element }}" id="element">
+                                                                <input type="hidden" name="description" value="
+*IncidentID:* {{ incident.id }}
+*First Occurrence:* {{ incident.firstEventTime }}
+*Last Occurrence:* {{ incident.lastEventTime }}
+*Event Summary:* {{ incident.event.summary }}
+*Event Category:* {{ incident.event.category }}
+*Event Severity:* {{ incident.event.severity }}
+*Element/Hostname:* {{ incident.element }}
+*Count:* {{ incident.count }}
+
+{% if incident.status == 'Acknowledged' %}
+Incident cleared at *{{ incident.acknowledged_time }}* by *{{ incident.acknowledged_by }}*
+{% elif incident.status == 'Cleared' %}
+Incident cleared at *{{ incident.acknowledged_time }}* by *{{ incident.acknowledged_by }}*
+Incident cleared at *{{ incident.close_time }}* by *{{ incident.closed_by }}*
+{% endif %}
+
+{% if incidentlogs %}
+{panel:title=First alert:}
+{{ incidentlogs.0.msg }}
+{panel}
+{% endif %}
+
+                                                                " id="element">
+                                                                <input type="submit" class="btn btn-success btn-small" value="Create JIRA ticket">
+                                                                </form>
+                                                            </td>
+                                                        {% endif %}
+                                                        </tr>
+                                                        {% endif %}
+{#                                                      End JIRA Stuff#}
                                                           <tr>
                                                           <td> <strong>Action: </strong></td>
                                                             <td colspan="3">
@@ -205,5 +252,9 @@
                             </div> <!-- tabs /-->
      </div><!--incident logs -->
 </div> <!-- container -->
-
+<script>
+$('input[type=submit]').click(function() {
+    $(this).attr('disabled', 'disabled');
+    $(this).parents('form').submit()
+})</script>
 {% include 'footer.html' %}

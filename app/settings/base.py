@@ -169,6 +169,9 @@ AWS_CONF = dict()
 RABBITMQ_CONF = dict()
 POLLER_CONFIG = dict()
 
+JIRA_OPTS = dict()
+JIRA_ENABLED = False
+
 try:
     from .secret_key import *
 except ImportError:

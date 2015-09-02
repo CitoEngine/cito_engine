@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -21,7 +22,7 @@ from django.template import RequestContext
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.http import Http404
 from django.utils import timezone
-from cito_engine.models import EventActionLog, Incident, IncidentLog, Team
+from cito_engine.models import EventActionLog, Incident, IncidentLog, Team, JIRATickets
 from cito_engine.forms import incidents
 from comments.models import Comments
 from comments.forms import CommentsForm
@@ -41,6 +42,17 @@ def get_incident_stats(team_id=None):
     return stats
 
 
+def parse_order_by(order_by):
+    ordering_list = dict(a_fe='firstEventTime',
+                         a_le='lastEventTime',
+                         a_count='total_incidents',
+                         d_fe='-firstEventTime',
+                         d_le='-lastEventTime',
+                         d_count='-total_incidents',
+                         )
+
+    return ordering_list.get(order_by, None)
+
 @login_required(login_url='/login/')
 def view_all_incidents(request, team_id=None, incident_status='active'):
     if request.user.perms.access_level > 4:
@@ -53,6 +65,8 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
     render_vars['incident_status'] = incident_status
     query_params['status__iexact'] = incident_status
 
+    order_by = parse_order_by(request.GET.get('order_by'))
+
     if not team_id:
         render_vars['stats'] = get_incident_stats()
         render_vars['redirect_to'] = '/incidents/view/%s' % incident_status
@@ -64,7 +78,11 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
         render_vars['redirect_to'] = '/incidents/view/%s/%s' % (team_id, incident_status)
         render_vars['team'] = team
 
-    incident_list = Incident.objects.filter(**query_params)
+    if order_by:
+        incident_list = Incident.objects.filter(**query_params).order_by(order_by)
+        render_vars['order_by'] = request.GET.get('order_by')
+    else:
+        incident_list = Incident.objects.filter(**query_params)
     # TODO: Convert 'Pages per result' into global and user setting
     paginator = Paginator(incident_list, 25)
     try:
@@ -78,6 +96,10 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
 
     render_vars['box_title'] = render_vars['page_title']
     render_vars['auto_refresh_page'] = True
+    # JIRA stuff
+    if settings.JIRA_ENABLED:
+        render_vars['jira_enabled'] = True
+        render_vars['jira_url'] = '%s/browse/' % settings.JIRA_OPTS['URL']
     return render_to_response('view_all_incidents.html', render_vars, context_instance=RequestContext(request))
 
 
@@ -86,6 +108,13 @@ def view_single_incident(request, incident_id):
     if request.user.perms.access_level > 4:
         return render_to_response('unauthorized.html', context_instance=RequestContext(request))
     incident = get_object_or_404(Incident, pk=incident_id)
+    if settings.JIRA_ENABLED:
+        jira_enabled = True
+        jira_url = '%s/browse/' % settings.JIRA_OPTS.get('URL')
+        try:
+            jira = JIRATickets.objects.get(incident=incident)
+        except Exception as e:
+            pass
     incidentlogs = IncidentLog.objects.filter(incident=incident).order_by('timestamp')
     eventactionlogs = EventActionLog.objects.filter(incident=incident).order_by('dateAdded')
     comments = Comments.objects.filter(incident=incident).order_by('date_added')
