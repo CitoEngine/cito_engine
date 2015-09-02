@@ -162,7 +162,11 @@
 <!-- Pagination start here -->
                 <div class="dataTables_paginate paging_bootstrap pagination">
                     <ul>
+
                         {% if incidents.has_previous %}
+                        <li class="prev">
+                            <a href="?page=1{% if order_by %}&order_by={{ order_by }} {% endif %}">←← First</a>
+                        </li>
                         <li class="prev">
                             <a href="?page={{ incidents.previous_page_number }}{% if order_by %}&order_by={{ order_by }} {% endif %}">← Previous</a>
                         </li>
@@ -180,11 +184,15 @@
                         <li class="next">
                             <a href="?page={{ incidents.next_page_number }}{% if order_by %}&order_by={{ order_by }} {% endif %}">Next → </a>
                         </li>
+                        <li class="next">
+                            <a href="?page={{ incidents.paginator.num_pages }}{% if order_by %}&order_by={{ order_by }} {% endif %}">Last →→ </a>
+                        </li>
                         {% else %}
                         <li class="next disabled">
                             <a href="#">Next → </a>
                         </li>
                         {% endif %}
+
                     </ul>
                 </div>
    <!-- Pagination ends here -->
