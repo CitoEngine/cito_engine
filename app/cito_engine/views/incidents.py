@@ -113,7 +113,7 @@ def view_single_incident(request, incident_id):
         jira_url = '%s/browse/' % settings.JIRA_OPTS.get('URL')
         try:
             jira = JIRATickets.objects.get(incident=incident)
-        except Exception as e:
+        except JIRATickets.DoesNotExist:
             pass
     incidentlogs = IncidentLog.objects.filter(incident=incident).order_by('timestamp')
     eventactionlogs = EventActionLog.objects.filter(incident=incident).order_by('dateAdded')
