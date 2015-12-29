@@ -21,7 +21,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from api.incident_listener import IncidentListenerAPI
 from rules_engine.views import SuppressionSearchView, SuppressionAddView, RemoveSuppression
-from cito_engine.views.jira import JIRAAddView
+from cito_engine.views.jira import JIRAAddView, JIRAUpdateView
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -59,6 +59,7 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
                         url(r'^jira/add/$', JIRAAddView.as_view()),
+                        url(r'^jira/update/$', JIRAUpdateView.as_view()),
                         )
 
 urlpatterns += patterns('',

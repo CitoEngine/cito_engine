@@ -8,6 +8,10 @@ import jira.resources
 
 logger = logging.getLogger('main')
 
+class JIRAUpdateForm(forms.Form):
+    ticket = forms.CharField(label='JIRA Ticket', max_length=100)
+    incident_id = forms.IntegerField()
+
 
 class JIRAForm(forms.Form):
 
