@@ -77,3 +77,8 @@ class JIRAForm(forms.Form):
             return jira_ticket.key
         else:
             raise forms.ValidationError(u"Error creating JIRA ticket, JIRA server did not return a ticket key.")
+
+
+class JIRABulkModifyForm(forms.Form):
+    incidents = forms.CharField()
+    jira_id = forms.CharField()
