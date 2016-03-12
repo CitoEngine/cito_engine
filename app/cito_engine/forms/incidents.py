@@ -36,3 +36,11 @@ class ElementSearchForm(forms.Form):
         super(forms.Form, self).__init__(*args, **kwargs)
         # change a widget attribute:
         self.fields['search_term'].widget.attrs["placeholder"] = 'Element Name'
+
+class BulkToggleIncidentForm(forms.Form):
+    STATUS_CHOICES = (
+        ('Acknowledged', 'Acknowledged'),
+        ('Cleared', 'Cleared')
+    )
+    incidents = forms.CharField()
+    toggle_status = forms.ChoiceField(choices=STATUS_CHOICES)
