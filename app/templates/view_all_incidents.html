@@ -46,8 +46,9 @@
     <div class="box-content">
 		<table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
 				 <thead>
-								  <tr>
-				     <th>Severity</th>
+				   <tr>
+				     <th><input type="checkbox" id="selectall">Select All</th>
+								    <th>Severity</th>
 									  <th>Incident ID</th>
 									  <th>[EventID] Summary</th>
 									  <th>Element</th>
@@ -71,7 +72,8 @@
 
 				<!-- Table 1st row -->
 				{% for i in incidents %}
-				    <tr>
+				<tr>
+				    <td><input type="checkbox" class="incidentcheckbox" name="bulkincidents" value={{ i.id }}></td>
 				    <td>{{ i.event.severity }}</td>
 				    <td><div class="btn-group"><a class="btn btn-info btn-mini" href="/incidents/view/{{ i.id }}"><i class="icon-list"></i>View {{ i.id }}</a></div>
 				    <td>[<a href="/events/view/{{ i.event.id }}">{{ i.event.id }}</a>] {{ i.event.summary }}</td>
@@ -140,7 +142,57 @@
 {#                                        $('#eventid').val(eventid);#}
 					$('#search_suppression').submit()
 				    }
+				    /* for bulk operation */
+				    var bulkincidents = [];
+				    function update_bulkincidents() {
+				       bulkincidents = [];
+				       $.each($("input[name='bulkincidents']:checked"), function(){
+				          bulkincidents.push($(this).val());
+                        });
+                        $("#bulkincidents").html('<strong>Selected ('+bulkincidents.length +') incidents:</strong>');
+				    }
+				    $(document).ready(function(){
+				    $("#selectall").change(function(){
+				        $(".incidentcheckbox").prop('checked', $(this).prop("checked"));
+				        update_bulkincidents();
+					  });
+				    });
+				    $(".incidentcheckbox").change(function() {
+				        // update bulk incidents array
+				        update_bulkincidents();
+				        // disable automatic page refresh
+				        reload_page = 0;
+				        console.log('value is ' + bulkincidents);
+				    });
+				    function bulk_toggle(){
+				        $("#bulk_toggle_incidents").prop('value', bulkincidents);
+				        $("#bulk_toggle_form").submit();
+				    }
+                    function bulk_jira_update(){
+				        $("#bulk_jira_incidents").prop('value', bulkincidents);
+				        $("#bulk_jira_form").submit();
+				    }
 				</script>
+							  <tr>
+                                    <td colspan="3">
+                                        <p id="bulkincidents"><strong>Selected (0) incidents: </strong></p>
+                                    </td>
+                                  <td>
+                                      <form method="post" id="bulk_toggle_form" action="/bulk/toggle/" class="form-inline" accept-charset="." style="margin-bottom: 0;"> {% csrf_token %}
+                                      <input type="hidden" name="incidents" value="" id="bulk_toggle_incidents">
+                                      <input type="submit" value="Bulk toggle" class="btn btn-info" id="bulkoperationsubmit" onclick="javascript:bulk_toggle();">
+                                     </form>
+                                </td>
+                                  <td>
+                                      <form method="post" id="bulk_jira_form" action="/bulk/jira_update/" class="form-inline" accept-charset="." style="margin-bottom: 0;"> {% csrf_token %}
+                                      <input type="hidden" name="incidents" value="" id="bulk_jira_incidents">
+                                      <input type="submit" value="Bulk JIRA update" class="btn btn-info" id="bulkoperationsubmit" onclick="javascript:bulk_jira_update();">
+                                    </form>
+
+                                  </td>
+								  <td colspan="9">
+								  </td>
+							  </tr>
 			 </tbody></table>
     </div>
 
@@ -157,7 +209,6 @@
 				    <input type="hidden" name="eventid" value="" id="eventid">
 				    <input type="hidden" name="element" value="" id="element">
 				</form>
-
 
 <!-- Pagination start here -->
 		<div class="dataTables_paginate paging_bootstrap pagination">
