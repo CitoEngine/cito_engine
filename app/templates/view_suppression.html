@@ -28,18 +28,29 @@
   <input type="hidden" name="record_type" value="">
   </form>
 
+    <div class="span12">
+        <div class="btn-group"><a class="btn btn-info" href="/suppression/add/"><i class="icon-plus"></i>Add a suppression rule</a></div>
+    </div>
 
-<div class="box span12">
+<div class="box span12" style="width: auto">
     <div class="box-content">
         <table class="table table-bordered table-striped table-condensed table-fixed-header table-hover">
+
+									  <th>Suppression details</th>
+									  <th>Added by</th>
+									  <th>From</th>
+									  <th>To</th>
+									  <th>Remove</th>
             <tbody>
             {% for record in event_sup %}
             <tr>
                 <td><div class="btn-group">
                     <a class="btn btn-info btn-mini" href="/events/view/{{ record.event.id }}">EventID #{{ record.event.id }}</a>
                     </div>
-                    suppressed by {{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}
+{#                    suppressed by {{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}#}
+                    <td>{{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}</td>
                 </td>
+                <td>{{ record.start_time|default_if_none:"-"}}</td><td>{{ record.end_time|default_if_none:"-"}}</td>
                 <td>
                     <input type="button" class="btn btn-info btn-small" value="Remove" onclick="javascript:suppression_remove({{ record.id }}, 'Event');">
                 </td>
@@ -48,8 +59,10 @@
             {% for record in element_sup %}
             <tr>
                 <td>
-                    Element {{ record.element }} suppressed by {{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}
+                    Element {{ record.element }}
                 </td>
+                <td>{{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}</td>
+                <td>{{ record.start_time|default_if_none:"-"}}</td><td>{{ record.end_time|default_if_none:"-"}}</td>
                 <td>
                     <input type="button" class="btn btn-info btn-small" value="Remove" onclick="javascript:suppression_remove({{ record.id }}, 'Element');">
                 </td>
@@ -60,8 +73,10 @@
                 <td><div class="btn-group">
                     <a class="btn btn-info btn-mini" href="/events/view/{{ record.event.id }}">EventID #{{ record.event.id }}</a>
                     </div>
-                    suppressed for element {{ record.element }} by {{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}
+                    suppressed for element {{ record.element }}
+                    <td>{{ record.suppressed_by.username }} on {{ record.date_added|date:"M d, Y, H:i" }}</td>
                 </td>
+                <td>{{ record.start_time|default_if_none:"-"}}</td><td>{{ record.end_time|default_if_none:"-"}}</td>
                 <td>
                     <input type="button" class="btn btn-info btn-small" value="Remove" onclick="javascript:suppression_remove({{ record.id }}, 'EventAndElementSuppressor');">
                 </td>
@@ -74,9 +89,6 @@
 {% endif %}
 {#End search results#}
 
-    <div class="span12">
-        <div class="btn-group"><a class="btn btn-info" href="/suppression/add/"><i class="icon-plus"></i>Add a suppression rule</a></div>
-    </div>
 
 </div> <!-- container -->
 

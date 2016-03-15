@@ -1,0 +1,267 @@
+{% include "header.html" %}
+{%  include 'top_nav_bar.html' %}
+{% include 'noscript.html' %}
+<div class="container-fluid">
+    <div class="box span12">
+        <div class="box-header well">
+            <h2><i class="icon-wrench"></i>{{ page_title }}</h2>
+        </div>
+        <div class="box-content">
+            {% if errors %}
+                <div class="alert alert-error span12">
+                    <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <form class="form-horizontal" method="POST" accept-charset="."> {% csrf_token %}
+                <input type="hidden" value="" name="start_date" id="start_date">
+                <input type="hidden" value="" name="end_date" id="end_date">
+                <div class="control-group">
+                    <label class="control-label" for="typeahead"><label for="id_suppression_type">Suppression type:</label></label>
+                    <div class="controls col-lg-4">
+                        <select id="id_suppression_type" name="suppression_type">
+                            <option value="1">EventID</option>
+                            <option value="2">Element</option>
+                            <option value="3">Event and Element</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="typeahead"><label for="id_eventid">EventID:</label></label>
+                    <div class="controls col-lg-4">
+                        <input id="id_eventid" min="1" name="eventid" type="number" value="{{ form.eventid.value|default_if_none:"" }}"/> <span class="help-inline">{{ form.eventid.errors }}</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="typeahead"><label for="id_element">Element:</label></label>
+                    <div class="controls col-lg-4">
+                        <input id="id_element" maxlength="255" name="element" type="text" value="{{ form.element.value|default_if_none:"" }}" /><span class="help-inline">{{ form.element.errors }}</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="typeahead">Start time</label>
+                    <div class="controls col-lg-4">
+                        <input id="start_date_widget" type="text">
+                        Hour: <select name="start_hour" id="start_hour">
+                        <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                        Minute: <select name="start_minute" id="start_minute">
+                        <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                        <option value="28">28</option>
+                        <option value="29">29</option>
+                        <option value="30">30</option>
+                        <option value="31">31</option>
+                        <option value="32">32</option>
+                        <option value="33">33</option>
+                        <option value="34">34</option>
+                        <option value="35">35</option>
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
+                        <option value="45">45</option>
+                        <option value="46">46</option>
+                        <option value="47">47</option>
+                        <option value="48">48</option>
+                        <option value="49">49</option>
+                        <option value="50">50</option>
+                        <option value="51">51</option>
+                        <option value="52">52</option>
+                        <option value="53">53</option>
+                        <option value="54">54</option>
+                        <option value="55">55</option>
+                        <option value="56">56</option>
+                        <option value="57">57</option>
+                        <option value="58">58</option>
+                        <option value="59">59</option>
+                    </select><span class="help-inline">{{ form.start_date.errors }}</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="typeahead">End time</label>
+                    <div class="controls col-lg-4">
+                        <input id="end_date_widget" class="form-control" type="text">
+                        Hour: <select name="end_hour" id="end_hour">
+                        <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                        Minute: <select name="end_minute" id="end_minute">
+                        <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                        <option value="28">28</option>
+                        <option value="29">29</option>
+                        <option value="30">30</option>
+                        <option value="31">31</option>
+                        <option value="32">32</option>
+                        <option value="33">33</option>
+                        <option value="34">34</option>
+                        <option value="35">35</option>
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
+                        <option value="45">45</option>
+                        <option value="46">46</option>
+                        <option value="47">47</option>
+                        <option value="48">48</option>
+                        <option value="49">49</option>
+                        <option value="50">50</option>
+                        <option value="51">51</option>
+                        <option value="52">52</option>
+                        <option value="53">53</option>
+                        <option value="54">54</option>
+                        <option value="55">55</option>
+                        <option value="56">56</option>
+                        <option value="57">57</option>
+                        <option value="58">58</option>
+                        <option value="59">59</option>
+                    </select><span class="help-inline">{{ form.end_date.errors }}</span>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary btn-small" onclick="suppression_form_submit()">Save Button</button>
+                    <button type="button" class="btn btn-small"  onclick="javascript:history.go(-1)">Cancel</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+</div> <!-- container -->
+<!-- Include Date Range Picker -->
+<link rel="stylesheet" href="/content/css/jquery-ui.css">
+<script src="/content/js/jquery-ui.js"></script>
+<script>
+    function suppression_form_submit(){
+        if ($('#start_date_widget').val() != '' && $('#end_date_widget').val() != ''){
+            var start_date = $('#start_date_widget').val() + ' ' + $('#start_hour').val() + ':' + $('#start_minute').val();
+            var end_date = $('#end_date_widget').val() + ' ' + $('#end_hour').val() + ':' + $('#end_minute').val();
+            $('#start_date').prop('value', start_date);
+            $('#end_date').prop('value', end_date);
+            console.log(start_date);
+            console.log(end_date);
+        }
+
+
+    }
+    $(document).ready(function() {
+        $('#start_date_widget').datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+        $('#end_date_widget').datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+    });
+</script>
+{% include 'footer.html' %}
