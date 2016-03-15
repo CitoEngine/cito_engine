@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 import factory
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
@@ -51,6 +52,7 @@ class EventFactory(factory.DjangoModelFactory):
 class IncidentFactory(factory.DjangoModelFactory):
     FACTORY_FOR = 'cito_engine.Incident'
     event = factory.LazyAttribute(lambda n: EventFactory())
+    lastEventTime = timezone.now()
     element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
 
 
