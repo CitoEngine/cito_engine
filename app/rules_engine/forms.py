@@ -108,20 +108,22 @@ class SuppressionAddForm(forms.Form):
         cleaned_data = self.clean()
         # Add Event Suppression
         if cleaned_data.get('suppression_type') == '1':
-            EventSuppressor.objects.create(event=self.event, suppressed_by=user,
+            EventSuppressor.objects.create(event=self.event,
+                                           suppressed_by=user,
                                            start_time=cleaned_data.get('start_date'),
                                            end_time=cleaned_data.get('end_date'))
 
         # Add Element Suppression
         elif cleaned_data.get('suppression_type') == '2':
-            ElementSuppressor.objects.create(element=cleaned_data.get('element'), suppressed_by=user,
+            ElementSuppressor.objects.create(element=cleaned_data.get('element').strip(),
+                                             suppressed_by=user,
                                              start_time=cleaned_data.get('start_date'),
                                              end_time=cleaned_data.get('end_date'))
 
         # Add Event and Element suppression
         elif cleaned_data.get('suppression_type') == '3':
             EventAndElementSuppressor.objects.create(event=self.event,
-                                                     element=cleaned_data.get('element'),
+                                                     element=cleaned_data.get('element').strip(),
                                                      suppressed_by=user,
                                                      start_time=cleaned_data.get('start_date'),
                                                      end_time=cleaned_data.get('end_date'))
