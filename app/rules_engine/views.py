@@ -17,7 +17,6 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic.edit import FormView, View
 from .models import EventAndElementSuppressor, EventSuppressor, ElementSuppressor
-
 from braces.views import LoginRequiredMixin
 from .forms import SuppressionSearchForm, SuppressionAddForm
 
@@ -33,8 +32,11 @@ class SuppressionSearchView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(SuppressionSearchView, self).get_context_data(**kwargs)
         context['page_title'] = 'Search Suppression'
-        context['count_total_suppressed'] = EventSuppressor.objects.count() + ElementSuppressor.objects.count()
-        context['count_total_suppressed'] = EventAndElementSuppressor.objects.count()
+        context['count_total_suppressed'] = EventSuppressor.objects.count() + ElementSuppressor.objects.count() + EventAndElementSuppressor.objects.count()
+        context['element_sup'] = ElementSuppressor.objects.all()
+        context['event_sup'] = EventSuppressor.objects.all()
+        context['event_and_element_sup'] = EventAndElementSuppressor.objects.all()
+        context['search_content'] = True
         return context
 
     def form_valid(self, form):
@@ -62,7 +64,7 @@ class SuppressionAddView(LoginRequiredMixin, FormView):
     """
     View to add Supression
     """
-    template_name = 'generic_form.html'
+    template_name = 'suppression_form.html'
     form_class = SuppressionAddForm
     success_url = '/suppression/view/'
 

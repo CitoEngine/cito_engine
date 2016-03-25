@@ -18,14 +18,17 @@ from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.generic.edit import FormView
 from django.template import RequestContext
 from django.shortcuts import redirect, render_to_response, get_object_or_404
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.utils import timezone
+from braces.views import LoginRequiredMixin
 from cito_engine.models import EventActionLog, Incident, IncidentLog, Team, JIRATickets
 from cito_engine.forms import incidents
 from comments.models import Comments
 from comments.forms import CommentsForm
+
 
 def get_incident_stats(team_id=None):
     last24hrs = timezone.make_aware(datetime.now() - timedelta(hours=24), timezone.get_current_timezone())
@@ -113,7 +116,7 @@ def view_single_incident(request, incident_id):
         jira_url = '%s/browse/' % settings.JIRA_OPTS.get('URL')
         try:
             jira = JIRATickets.objects.get(incident=incident)
-        except Exception as e:
+        except JIRATickets.DoesNotExist:
             pass
     incidentlogs = IncidentLog.objects.filter(incident=incident).order_by('timestamp')
     eventactionlogs = EventActionLog.objects.filter(incident=incident).order_by('dateAdded')
@@ -169,3 +172,35 @@ def view_element(request):
         form = incidents.ElementSearchForm()
     render_vars['search_form'] = form
     return render_to_response('view_elements.html', render_vars, context_instance=RequestContext(request))
+
+
+class BulkToggleIncidents(LoginRequiredMixin, FormView):
+    template_name = 'generic_form.html'
+    form_class = incidents.BulkToggleIncidentForm
+    success_url = '/incidents/'
+
+    def get_context_data(self, **kwargs):
+        context = super(BulkToggleIncidents, self).get_context_data(**kwargs)
+        context['page_title'] = context['box_title'] = 'Bulk toggle incidents'
+        return context
+
+    def form_valid(self, form):
+        incidents = form.cleaned_data.get('incidents')
+        toggle_status = form.cleaned_data.get('toggle_status')
+        # make sure we received a list of incident ids
+        try:
+            incident_list = [int(i) for i in incidents.split(',')]
+        except:
+            return HttpResponse(status=400, content=b'Bad instance IDs')
+
+        if not incident_list:
+            return redirect(self.success_url)
+
+        for incident in Incident.objects.filter(pk__in=incident_list):
+            if incident.status != toggle_status:
+                incident.toggle_status(status=toggle_status,
+                                       user=self.request.user,
+                                       time=datetime.utcnow())
+                incident.save()
+
+        return redirect(self.success_url)

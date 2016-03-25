@@ -41,6 +41,8 @@ class SuppressionAddForm(forms.Form):
     eventid = forms.IntegerField(label='EventID', min_value=1, required=False)
     element = forms.CharField(max_length=255, label='Element', required=False)
     suppression_type = forms.ChoiceField(choices=SUPP_CHOICES)
+    start_date = forms.DateTimeField(required=False, input_formats=['%Y-%m-%d %H:%M'])
+    end_date = forms.DateTimeField(required=False, input_formats=['%Y-%m-%d %H:%M'])
 
     def __init__(self, *args, **kwargs):
         self.event = None
@@ -63,6 +65,16 @@ class SuppressionAddForm(forms.Form):
         eventid = cleaned_data.get('eventid')
         element = cleaned_data.get('element').strip()
         suppression_type = cleaned_data.get('suppression_type')
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+
+        if start_date is None and end_date is not None:
+            self._errors['end_date'] = self.error_class([u'End date cannot be specified without a start date'])
+        if end_date is None and start_date is not None:
+            self._errors['start_date'] = self.error_class([u'Start date cannot be specified without an end date'])
+
+        if start_date > end_date:
+            self._errors['end_date'] = self.error_class([u'End date cannot be greater than start date'])
 
         if eventid is None and (element is None or element is u''):
             msg = u'At least one field has to be entered'
@@ -96,16 +108,24 @@ class SuppressionAddForm(forms.Form):
         cleaned_data = self.clean()
         # Add Event Suppression
         if cleaned_data.get('suppression_type') == '1':
-            EventSuppressor.objects.create(event=self.event, suppressed_by=user)
+            EventSuppressor.objects.create(event=self.event,
+                                           suppressed_by=user,
+                                           start_time=cleaned_data.get('start_date'),
+                                           end_time=cleaned_data.get('end_date'))
 
         # Add Element Suppression
         elif cleaned_data.get('suppression_type') == '2':
-            ElementSuppressor.objects.create(element=cleaned_data.get('element'), suppressed_by=user)
+            ElementSuppressor.objects.create(element=cleaned_data.get('element').strip(),
+                                             suppressed_by=user,
+                                             start_time=cleaned_data.get('start_date'),
+                                             end_time=cleaned_data.get('end_date'))
 
         # Add Event and Element suppression
         elif cleaned_data.get('suppression_type') == '3':
             EventAndElementSuppressor.objects.create(event=self.event,
-                                                     element=cleaned_data.get('element'),
-                                                     suppressed_by=user)
+                                                     element=cleaned_data.get('element').strip(),
+                                                     suppressed_by=user,
+                                                     start_time=cleaned_data.get('start_date'),
+                                                     end_time=cleaned_data.get('end_date'))
         else:
             raise ValueError('Invalid suppression_type received by SuppressionAddForm')

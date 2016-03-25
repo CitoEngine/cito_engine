@@ -21,7 +21,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from api.incident_listener import IncidentListenerAPI
 from rules_engine.views import SuppressionSearchView, SuppressionAddView, RemoveSuppression
-from cito_engine.views.jira import JIRAAddView
+from cito_engine.views.jira import JIRAAddView, JIRAUpdateView, JIRABulkUpdateView
+from cito_engine.views.incidents import BulkToggleIncidents
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -59,6 +61,7 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
                         url(r'^jira/add/$', JIRAAddView.as_view()),
+                        url(r'^jira/update/$', JIRAUpdateView.as_view()),
                         )
 
 urlpatterns += patterns('',
@@ -105,8 +108,11 @@ urlpatterns += patterns('',
                         url(r'^reports/elements/incidents/$', 'reports.views.report_incidents_per_element'),
                         )
 
-
-
+# Bulk operations
+urlpatterns += patterns('',
+                        url(r'^bulk/toggle/$', BulkToggleIncidents.as_view()),
+                        url(r'^bulk/jira_update/$', JIRABulkUpdateView.as_view()),
+                        )
 
 # urlpatterns += staticfiles_urlpatterns()
 

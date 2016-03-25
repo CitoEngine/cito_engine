@@ -284,6 +284,10 @@ margin-left:-4.5px;
 padding:10px;
 }
 
+.box-content-custom{
+    padding:0;
+}
+
 [class^="icon-"],
 [class*=" icon-"]
 {
@@ -445,4 +449,7 @@ text-align:center;
 .sr-btn
 {
   border-radius:0, 5px, 5px, 0;
+}
+.form-horizontal select {
+    width: auto;
 }

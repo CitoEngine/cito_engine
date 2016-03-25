@@ -7,12 +7,15 @@
         	<script src="/content/js/{{ js }}"></script>
     {% endfor %}
     <script type="application/javascript">
-        $("#success_msg").delay(200).addClass("in").fadeOut(4000);
+      var reload_page = 1;
+      $("#success_msg").delay(200).addClass("in").fadeOut(4000);
         $('tbody.rowlink').rowlink();
         {% if auto_refresh_page %}
          setInterval('refreshPage()', 30000);
         {% endif %}
-        function refreshPage() { location.reload(); }
+      function refreshPage() {
+        if(reload_page==1) {location.reload();}
+      }
     </script>
 
     {% if include_view_reports_js %}

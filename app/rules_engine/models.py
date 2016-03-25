@@ -37,6 +37,8 @@ class EventSuppressor(models.Model):
     event = models.ForeignKey(Event, db_index=True)
     suppressed_by = models.ForeignKey(User)
     date_added = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return unicode('%s|%s' % (self.event, self.suppressed_by))
@@ -49,6 +51,8 @@ class ElementSuppressor(models.Model):
     element = models.CharField(db_index=True, max_length=255)
     suppressed_by = models.ForeignKey(User)
     date_added = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return unicode('%s|%s' % (self.element, self.suppressed_by))
@@ -62,6 +66,8 @@ class EventAndElementSuppressor(models.Model):
     element = models.CharField(db_index=True, max_length=255)
     suppressed_by = models.ForeignKey(User)
     date_added = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return unicode('%s|%s|%s' % (self.element, self.event, self.suppressed_by))

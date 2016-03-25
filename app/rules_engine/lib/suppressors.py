@@ -21,19 +21,52 @@ class SuppressorPipeLine(object):
 
     def __init__(self):
         self._incident = None
+        self.msg = None
 
     @property
     def is_event_suppressed(self):
-        return EventSuppressor.objects.filter(event=self._incident.event).exists()
+        try:
+            event_sup = EventSuppressor.objects.get(event=self._incident.event)
+        except EventSuppressor.DoesNotExist:
+            return False
+        if event_sup.start_time and event_sup.end_time:
+            if event_sup.start_time < self._incident.lastEventTime < event_sup.end_time:
+                self.msg = 'Event Suppressed %s < %s < %s ' % (event_sup.start_time, self._incident.lastEventTime, event_sup.end_time)
+                return True
+            return False
+        self.msg = 'Incident matches event suppression rule'
+        return True
 
     @property
     def is_element_suppressed(self):
-        return ElementSuppressor.objects.filter(element=self._incident.element).exists()
+        try:
+            event_sup = ElementSuppressor.objects.get(element=self._incident.element)
+        except ElementSuppressor.DoesNotExist:
+            return False
+        if event_sup.start_time and event_sup.end_time:
+            if event_sup.start_time < self._incident.lastEventTime < event_sup.end_time:
+                self.msg = 'Element Suppressed %s < %s < %s ' % (
+                    event_sup.start_time, self._incident.lastEventTime, event_sup.end_time)
+                return True
+            return False
+        self.msg = 'Incident matches element suppression rule'
+        return True
 
     @property
     def is_element_and_event_suppressed(self):
-        return EventAndElementSuppressor.objects.filter(event=self._incident.event,
-                                                        element=self._incident.element).exists()
+        try:
+            event_sup = EventAndElementSuppressor.objects.get(event=self._incident.event,
+                                                              element=self._incident.element)
+        except EventAndElementSuppressor.DoesNotExist:
+            return False
+        if event_sup.start_time and event_sup.end_time:
+            if event_sup.start_time < self._incident.lastEventTime < event_sup.end_time:
+                self.msg = 'Event and Element Suppressed %s < %s < %s ' % (
+                    event_sup.start_time, self._incident.lastEventTime, event_sup.end_time)
+                return True
+            return False
+        self.msg = 'Incident matches event and element suppression rule'
+        return True
 
     def is_suppressed(self, incident):
         if incident is None:
@@ -41,14 +74,8 @@ class SuppressorPipeLine(object):
 
         self._incident = incident
 
-        if self.is_event_suppressed:
-            incidentauditlog(message='Incident matches event suppression rule', incident=self._incident)
-            return True
-        elif self.is_element_suppressed:
-            incidentauditlog(message='Incident matches element suppression rule', incident=self._incident)
-            return True
-        elif self.is_element_and_event_suppressed:
-            incidentauditlog(message='Incident matches event and element suppression rule', incident=self._incident)
+        if self.is_event_suppressed or self.is_element_suppressed or self.is_element_and_event_suppressed:
+            incidentauditlog(message=self.msg, incident=self._incident, level='DEBUG')
             return True
         else:
             return False
