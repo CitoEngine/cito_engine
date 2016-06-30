@@ -85,6 +85,7 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
                         url(r'^dashboard/$', 'cito_engine.views.dashboards.teamview'),
+                        url(r'^api/v1/dashboard/$', 'cito_engine.views.dashboards.api_teamview'),
                         )
 
 # #TODO: Remove addevent before releasing v1.0

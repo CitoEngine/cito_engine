@@ -12,17 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from collections import OrderedDict
+import json
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from cito_engine.models import Incident, Team
 
-@login_required(login_url='/login/')
-def teamview(request):
-    team_dashboard = dict()
+
+def get_dashboard_data():
+    """
+    Returns a dictionary of teams with active/acknowledged alerts.
+    :return:
+    """
+    team_dashboard = OrderedDict()
+
     try:
-        teams = Team.objects.all()
+        teams = Team.objects.all().order_by('name')
     except Team.DoesNotExist:
         teams = None
 
@@ -45,7 +52,17 @@ def teamview(request):
     for i in acked_incidents:
         team_dashboard[i.event.team.name]['acknowledged'] += 1
 
+    return team_dashboard
+
+@login_required(login_url='/login/')
+def teamview(request):
+    team_dashboard = get_dashboard_data()
     return render_to_response('dashboard_team_views.html',
                               {'team_dashboard': team_dashboard,
                                'auto_refresh_page': True},
                               context_instance=RequestContext(request))
+
+
+def api_teamview(request):
+    team_dashboard = get_dashboard_data()
+    return HttpResponse(content=json.dumps(team_dashboard), content_type='application/json')
