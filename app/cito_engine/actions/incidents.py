@@ -111,9 +111,9 @@ def add_incident(e, timestamp):
 
     # Ignore incident if event does not exist
     try:
-        event = Event.objects.get(pk=event_id)
+        event = Event.objects.get(pk=event_id, status=True)
     except Event.DoesNotExist:
-        logger.info('Received incident for non existent event_id:%s, incident:%s' % (event_id, e))
+        logger.info('Received incident for non existent or disabled event_id:%s, incident:%s' % (event_id, e))
         return
     #TODO: SQL sanity checks
     #TODO: Msg len check??
