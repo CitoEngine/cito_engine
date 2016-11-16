@@ -43,7 +43,7 @@ ALLOWED_HOSTS = *
 #####################################################################
 [DATABASE]
 ENGINE = mysql
-DBNAME =
+DBNAME = citoengine
 DBUSER = root
 DBPASSWORD = password
 DBHOST = 127.0.0.1
