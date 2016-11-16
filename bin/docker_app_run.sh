@@ -24,7 +24,7 @@ service rabbitmq-server  start
 #Rabbitmq adding the necessary info
 rabbitmqctl add_user citoengine changeme!
 rabbitmqctl add_vhost /citoengine_event_listener
-rabbitmqctl set_permissions -p /citoengine_event_listener citoengine_user ".*" ".*" ".*"
+rabbitmqctl set_permissions -p /citoengine_event_listener citoengine ".*" ".*" ".*"
 rabbitmqctl set_permissions -p /citoengine_event_listener citoengine ".*" ".*" ".*"
 
 service mysql restart
