@@ -28,9 +28,9 @@ BIND_IP=0.0.0.0:${PORT}
 USER=root
 GROUP=root
 
-if [ ${USER} != "www-data" ]; then
-    echo "!!!WARNING!! You should probably run this script with www-data"
-fi
+#if [ ${USER} != "www-data" ]; then
+#    echo "!!!WARNING!! You should probably run this script with www-data"
+#fi
 
 
 test -d ${LOGDIR} || mkdir -p ${LOGDIR}
