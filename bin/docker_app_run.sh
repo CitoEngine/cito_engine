@@ -15,12 +15,7 @@
 
 
 set -e
-APP_ROOT=/citoengine/
-APP_DIR=${APP_ROOT}/app
 
-LOGFILE=${APP_ROOT}/logs/webapp.log
-LOGDIR=$(dirname $LOGFILE)
-NUM_WORKERS=2
 PORT=8000
 BIND_IP=0.0.0.0:${PORT}
 
@@ -32,13 +27,6 @@ GROUP=root
 #    echo "!!!WARNING!! You should probably run this script with www-data"
 #fi
 
-
-test -d ${LOGDIR} || mkdir -p ${LOGDIR}
-
 service mysql restart
 
-gunicorn settings.wsgi\
-    --workers ${NUM_WORKERS} \
-    --worker-class gevent  \
-    --user=${USER} --group=${GROUP} \
-    --log-level=info --log-file=${LOGFILE} 2>>${LOGFILE} --bind ${BIND_IP}
+python app/manage.py runserver $BIND_IP
