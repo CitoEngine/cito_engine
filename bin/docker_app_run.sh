@@ -29,4 +29,6 @@ GROUP=root
 
 service mysql restart
 
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password')" | python app/manage.py shell
+
 python app/manage.py runserver $BIND_IP
