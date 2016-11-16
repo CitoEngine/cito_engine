@@ -19,13 +19,13 @@ set -e
 PORT=8000
 BIND_IP=0.0.0.0:${PORT}
 
-# user/group to run as
-USER=root
-GROUP=root
+service rabbitmq-server  start
 
-#if [ ${USER} != "www-data" ]; then
-#    echo "!!!WARNING!! You should probably run this script with www-data"
-#fi
+#Rabbitmq adding the necessary info
+rabbitmqctl add_user citoengine changeme!
+rabbitmqctl add_vhost /citoengine_event_listener
+rabbitmqctl set_permissions -p /citoengine_event_listener citoengine_user ".*" ".*" ".*"
+rabbitmqctl set_permissions -p /citoengine_event_listener citoengine ".*" ".*" ".*"
 
 service mysql restart
 
