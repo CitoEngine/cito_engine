@@ -198,11 +198,11 @@ class EventActionCounter(models.Model):
         if self.timer > self.event_action.threshold_timer:
             # If threshold was one incident in Y secs, we have to return True
             if self.event_action.threshold_count == 1:
-		self.is_triggered = True
+                self.is_triggered = True
                 self._reset_all()
                 return True
 
-	    # else
+            # else
             self.is_triggered = False
             self._reset_all()
 
