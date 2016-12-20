@@ -201,10 +201,9 @@ class EventActionCounter(models.Model):
                 self.is_triggered = True
                 self._reset_all()
                 return True
-
-            # else
-            self.is_triggered = False
-            self._reset_all()
+            else:
+                self.is_triggered = False
+                self._reset_all()
 
         # Check if X incidents occured in Y seconds
         elif self.count >= self.event_action.threshold_count and self.timer <= self.event_action.threshold_timer:
