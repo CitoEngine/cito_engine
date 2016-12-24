@@ -194,17 +194,22 @@ class EventActionCounter(models.Model):
 
     @property
     def is_action_required(self):
+        # Got an incident outside the timer
+        if self.timer > self.event_action.threshold_timer:
+            # If threshold was one incident in Y secs, we have to return True
+            if self.event_action.threshold_count == 1:
+                self.is_triggered = True
+                self._reset_all()
+                return True
+            else:
+                self.is_triggered = False
+                self._reset_all()
+
         # Check if X incidents occured in Y seconds
-        if self.count >= self.event_action.threshold_count and self.timer <= self.event_action.threshold_timer:
+        elif self.count >= self.event_action.threshold_count and self.timer <= self.event_action.threshold_timer:
             if not self.is_triggered:
                 self.is_triggered = True
                 self.save()
-                return True
-        # Got an incident outside the timer
-        elif self.timer > self.event_action.threshold_timer:
-            # If threshold was one incident in Y secs, we have to return True
-            self._reset_all()
-            if self.event_action.threshold_count == 1:
                 return True
 
         return False
@@ -212,7 +217,6 @@ class EventActionCounter(models.Model):
     def _reset_all(self):
         self.count = 1
         self.timer = 0
-        self.is_triggered = False
         self.save()
 
     def __unicode__(self):
