@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.db.models.query_utils import Q
@@ -24,7 +24,7 @@ from cito_engine.forms import categories
 @login_required(login_url='/login/')
 def view_all_categories(request):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Categories'
     box_title = page_title
     try:
@@ -32,13 +32,13 @@ def view_all_categories(request):
     except Category.DoesNotExist:
         categories = None
 
-    return render_to_response('view_categories.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'view_categories.html', locals())
 
 
 @login_required(login_url='/login/')
 def edit_category(request, category_id):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Editing category'
     box_title = page_title
     category = get_object_or_404(Category, pk=category_id)
@@ -55,13 +55,13 @@ def edit_category(request, category_id):
                 return redirect('/categories/')
     else:
         form = categories.CategoryForm(instance=category)
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 
 @login_required(login_url='/login/')
 def add_category(request):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Add a new category'
     box_title = page_title
     if request.method == 'POST':
@@ -75,4 +75,4 @@ def add_category(request):
                 return redirect('/categories/')
     else:
         form = categories.CategoryForm()
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
