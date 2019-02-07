@@ -14,7 +14,7 @@ limitations under the License.
 """
 
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from ipware.ip import get_ip
 from appauth.models import Perms
@@ -61,13 +61,11 @@ def login_user(request):
             auth_logger.info('Failed login attempt from user:%s from %s' % (username, ip))
             state = "Username/Password incorrect"
 
-    return render_to_response('login.html',
-                              {'state': state, 'username': username, 'redirect_to': redirect_to},
-                              context_instance=RequestContext(request))
+    return render(request, 'login.html', {'state': state, 'username': username, 'redirect_to': redirect_to})
 
 
 def logout_user(request):
     logout(request)
     ip = get_ip(request)
     auth_logger.info('User:%s logged out from %s' % (request.user.username, ip))
-    return render_to_response('logout.html', context_instance=RequestContext(request))
+    return render(request, 'logout.html')
