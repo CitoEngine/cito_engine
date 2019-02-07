@@ -16,7 +16,7 @@ limitations under the License.
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from cito_engine.models import PluginServer, Plugin
 from cito_engine.forms import pluginserver
 from cito_engine.poller import pluginpoller
@@ -25,7 +25,7 @@ from cito_engine.poller import pluginpoller
 def view_all_pluginservers(request):
     render_vars = dict()
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
 
     search_form = pluginserver.PluginSearchForm()
     if request.method == "POST":
@@ -42,22 +42,22 @@ def view_all_pluginservers(request):
             render_vars['servers'] = None
 
     render_vars[search_form] = search_form
-    return render_to_response('view_all_pluginservers.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'view_all_pluginservers.html', render_vars)
 
 
 @login_required(login_url='/login/')
 def view_single_pluginserver(request, pluginserver_id):
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'View plugin server'
     box_title = page_title
     pluginserver = get_object_or_404(PluginServer, pk=pluginserver_id)
-    return render_to_response('view_pluginserver.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'view_pluginserver.html', locals())
 
 @login_required(login_url='/login/')
 def add_pluginserver(request):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Add a plugin server'
     box_title = page_title
     if request.method == "POST":
@@ -71,12 +71,12 @@ def add_pluginserver(request):
                 return redirect('/pluginservers/')
     else:
         form = pluginserver.PluginServerForm()
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 @login_required(login_url='/login/')
 def edit_pluginserver(request, pluginserver_id):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Editing plugin server'
     box_title = page_title
     ps = get_object_or_404(PluginServer, pk=pluginserver_id)
@@ -95,12 +95,12 @@ def edit_pluginserver(request, pluginserver_id):
                 return redirect('/pluginservers/view/%s/' % pluginserver_id)
     else:
         form = pluginserver.PluginServerForm(instance=ps)
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 @login_required(login_url='/login/')
 def refresh_pluginserver(request, pluginserver_id):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     plugin_server = get_object_or_404(PluginServer, pk=pluginserver_id)
     pluginpoller.pluginpoller(plugin_server)
     return redirect('/pluginservers/view/%s/' % pluginserver_id)
