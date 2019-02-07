@@ -1,4 +1,4 @@
-Django>1.11.18
+Django==1.11.18
 #MySQL-python==1.2.5
 mysql-connector-python
 Unipath==1.0
