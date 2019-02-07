@@ -13,27 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
-from django.db.models import get_models, get_app
+from django.apps import apps
 from django.contrib import admin
+
 from django.contrib.admin.sites import AlreadyRegistered
 
-def autoregister(*app_list):
-    for app_name in app_list:
-        app_models = get_app(app_name)
-        for model in get_models(app_models):
-            try:
-                admin.site.register(model)
-            except AlreadyRegistered:
-                pass
-
-autoregister('cito_engine')
-autoregister('appauth')
-autoregister('reports')
-autoregister('comments')
-autoregister('rules_engine')
-autoregister('audit')
-
-
-
-
+for app_model in apps.get_models():
+    try:
+        admin.site.register(app_model)
+    except AlreadyRegistered:
+        pass
