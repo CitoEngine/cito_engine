@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from django.forms.formsets import formset_factory
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
@@ -55,12 +55,11 @@ def bulk_upload_events(request):
                     if form.cleaned_data.get('team') not in user_teams:
                         render_vars['errors'] = ['Cannot add event for %s, you are not a member of this team.' %
                                                  form.cleaned_data.get('team')]
-                        return render_to_response('bulk_upload.html', render_vars,
-                                                  context_instance=RequestContext(request))
+                        return render(request, 'bulk_upload.html', render_vars)
                     else:
                         form.save()
                 return redirect('/events/')
-    return render_to_response('bulk_upload.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'bulk_upload.html', render_vars)
 
 
 @login_required(login_url='/login/')
@@ -73,4 +72,4 @@ def show_bulk_upload_form(request, upload_item):
 
     if upload_item == 'events':
         render_vars['form_action'] = '/tools/bulkupload/events/confirm/'
-    return render_to_response('generic_form.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', render_vars)
