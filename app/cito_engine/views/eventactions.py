@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.utils import timezone
@@ -24,7 +24,7 @@ import simplejson
 @login_required(login_url='/login/')
 def edit_eventaction(request, eventaction_id):
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Add event action'
     box_title = page_title
     eventaction = get_object_or_404(EventAction, pk=eventaction_id)
@@ -54,13 +54,13 @@ def edit_eventaction(request, eventaction_id):
             json_data = simplejson.loads(eventaction.pluginParameters)
         except simplejson.JSONDecodeError:
             pass
-    return render_to_response('eventaction_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'eventaction_form.html', locals())
 
 
 @login_required(login_url='/login/')
 def add_eventaction(request, event_id):
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Add event action for EventID: %s' % event_id
     box_title = page_title
     event = get_object_or_404(Event, pk=event_id)
@@ -74,4 +74,4 @@ def add_eventaction(request, event_id):
             errors = form.errors
     else:
         form = eventactions.EventActionForm(initial={'event': event_id})
-    return render_to_response('eventaction_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'eventaction_form.html', locals())

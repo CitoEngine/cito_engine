@@ -14,12 +14,13 @@ limitations under the License.
 """
 
 from datetime import datetime
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from cito_engine.models import Team, Event
 from . import actions
 from .forms import AllIncidentsReportForm, EventsPerTeam, MostAlertedElements, IncidentsPerElement
+
 
 @login_required(login_url='/login/')
 def report_all_incidents(request):
@@ -78,7 +79,8 @@ def report_all_incidents(request):
     else:
         render_vars['page_title'] = 'Select one or more options to generate the report.'
         render_vars['nothing_selected'] = True
-    return render_to_response('reports_all_incidents.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'reports_all_incidents.html', render_vars)
+
 
 @login_required(login_url='/login/')
 def report_events_in_system(request):
@@ -96,8 +98,7 @@ def report_events_in_system(request):
             'css_list': css_list,
         }
 
-    return render_to_response('reports_events_in_system.html', render_vars,
-                              context_instance=RequestContext(request))
+    return render(request, 'reports_events_in_system.html', render_vars)
 
 
 @login_required(login_url='/login/')
@@ -138,8 +139,8 @@ def report_incidents_per_event(request):
 
     else:
         render_vars['nothing_selected'] = True
-    return render_to_response('reports_incidents_per_event.html', render_vars,
-                              context_instance=RequestContext(request))
+    return render(request, 'reports_incidents_per_event.html', render_vars)
+
 
 @login_required(login_url='/login/')
 def report_most_alerted_elements(request):
@@ -153,8 +154,7 @@ def report_most_alerted_elements(request):
             days = int(form.cleaned_data.get('timerange'))
             result_limit = form.cleaned_data.get('result_limit')
             render_vars['elements_by_incidents'] = actions.get_most_alerted_elements(days, result_limit)
-    return render_to_response('reports_most_alerted_elements.html', render_vars,
-                              context_instance=RequestContext(request))
+    return render(request, 'reports_most_alerted_elements.html', render_vars)
 
 
 def report_incidents_per_element(request):
@@ -173,5 +173,4 @@ def report_incidents_per_element(request):
             render_vars['incidents'] = actions.get_incidents_for_element(days=days,
                                                                          element=element,
                                                                          result_limit=result_limit)
-    return render_to_response('reports_incidents_per_element.html',
-                              render_vars, context_instance=RequestContext(request))
+    return render(request, 'reports_incidents_per_element.html', render_vars)

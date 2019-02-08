@@ -15,7 +15,7 @@ limitations under the License.
 
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from cito_engine.models import Incident, Team
 
 @login_required(login_url='/login/')
@@ -45,7 +45,4 @@ def teamview(request):
     for i in acked_incidents:
         team_dashboard[i.event.team.name]['acknowledged'] += 1
 
-    return render_to_response('dashboard_team_views.html',
-                              {'team_dashboard': team_dashboard,
-                               'auto_refresh_page': True},
-                              context_instance=RequestContext(request))
+    return render(request, 'dashboard_team_views.html', {'team_dashboard': team_dashboard, 'auto_refresh_page': True})

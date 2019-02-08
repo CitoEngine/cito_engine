@@ -1,0 +1,134 @@
+#####################################################################
+#
+# General configuration settings
+#
+#####################################################################
+[GENERAL]
+
+# Keep this false in production environment
+DEBUG = False
+
+# Keep this false in production environment
+TEMPLATE_DEBUG = False
+
+# Should be writeable
+LOG_PATH = /tmp/
+
+# Valid options RABBITMQ or SQS
+QUEUE_TYPE = RABBITMQ
+
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# In a Windows environment this must be set to your system time zone.
+TIME_ZONE = UTC
+
+# Login URL to redirect to if user is not authenticated
+# Do not modify these setting unless you know what you are doing
+LOGIN_URL = /login/
+
+# Allowed hosts to the application server, default: all(*)
+# eg.
+#   ALLOWED_HOSTS = *
+#   ALLOWED_HOSTS = .example.com, foo.bar.com
+# Do not modify these setting unless you know what you are doing
+ALLOWED_HOSTS = *
+
+#####################################################################
+#
+# Database configuration:
+#
+# Valid ENGINE's are mysql, postgresql_psycopg2, sqlite3
+#
+#####################################################################
+[DATABASE]
+ENGINE = mysql
+DBNAME = citoengine
+DBUSER = root
+DBPASSWORD =
+DBHOST = localhost
+DBPORT = 3306
+
+#####################################################################
+#
+# Message Queue configuration:
+#
+# Setup AWS or RabbitMQ based on QUEUE_TYPE selected above
+#
+#####################################################################
+[RABBITMQ]
+HOST = localhost
+PORT = 5672
+USERNAME = citoengine
+PASSWORD = changeme!
+SSL = False
+EXCHANGE =
+VHOST = /citoengine_event_listener
+QUEUE = citoengine_commonq
+
+# Leave this blank if you are using rabbitmq
+[AWS]
+REGION = us-east1
+AWSKEY =
+AWSSECRET =
+SQSQUEUE =
+
+#####################################################################
+#
+# Message Poller configuration:
+#
+#####################################################################
+[POLLER]
+
+# Polling interval in seconds
+INTERVAL = 5
+
+# Number of messages to poll from queue
+BATCHSIZE = 10
+
+# AWS SQS specific setting, ignore if you are using Rabbitmq
+# How long should the poller hold on the the message before someone else picks it up on
+VISIBILITY = 60
+
+#####################################################################
+#
+# JIRA configuration:
+#
+#####################################################################
+# To enable, set it to True else keep as False
+JIRA_ENABLED = False
+
+# JIRA Username
+JIRA_USER = jira-user
+
+# JIRA Password
+JIRA_PASSWORD = jira-password
+
+# Your JIRA FQDN without trailing slash
+JIRA_URL = https://example.atlassian.net
+
+# Comma separated list of JIRA projects (case sensitive)
+JIRA_PROJECTS = TEST, XFILES
+
+# Comma separated list of JIRA Types (case sensitive)
+JIRA_ISSUE_TYPES = Task, Bug
+
+# Comma separated list of JIRA components (case sensitive)
+JIRA_COMPONENTS = Foo, Bar
+
+# To enable, set it to True else keep as False
+JIRA_VERIFY_SSL = True
+
+
+#####################################################################
+#
+# Development settings configuration:
+#
+# Used while developing or testing
+#
+#####################################################################
+[DEVELOPMENT]
+DEVMODE = True
+INSTALLED_APPS = django_nose
+TEST_RUNNER = django_nose.NoseTestSuiteRunner
+SOUTH_TESTS_MIGRATE = False

@@ -77,7 +77,7 @@ class TestAppauthViews(TestCase):
         self.user.is_active = False
         self.user.save()
         response = self.client.post('/login/', data=dict(username='hodor', password='hodor'), follow=True)
-        self.assertContains(response, 'Your account is inactive, please contact the administrator.')
+        self.assertContains(response, 'Username/Password incorrect')
 
     def test_logout(self):
         """Logout user

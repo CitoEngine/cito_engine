@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.db.models.query_utils import Q
@@ -24,7 +24,7 @@ from cito_engine.forms import teams
 @login_required(login_url='/login/')
 def view_all_teams(request):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Teams'
     box_title = page_title
     try:
@@ -32,13 +32,13 @@ def view_all_teams(request):
     except Team.DoesNotExist:
         teams = None
 
-    return render_to_response('view_teams.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'view_teams.html', locals())
 
 
 @login_required(login_url='/login/')
 def edit_team(request, team_id):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Editing team'
     box_title = page_title
     team = get_object_or_404(Team, pk=team_id)
@@ -56,13 +56,13 @@ def edit_team(request, team_id):
                 return redirect('/teams/')
     else:
         form = teams.TeamForm(instance=team)
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 
 @login_required(login_url='/login/')
 def add_team(request):
     if request.user.perms.access_level > 1:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Add a new team'
     box_title = page_title
     if request.method == 'POST':
@@ -76,4 +76,5 @@ def add_team(request):
                 return redirect('/teams/')
     else:
         form = teams.TeamForm()
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
+

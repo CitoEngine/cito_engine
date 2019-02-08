@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic.edit import FormView
 from django.template import RequestContext
-from django.shortcuts import redirect, render_to_response, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from braces.views import LoginRequiredMixin
@@ -59,7 +59,7 @@ def parse_order_by(order_by):
 @login_required(login_url='/login/')
 def view_all_incidents(request, team_id=None, incident_status='active'):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, template_name='unauthorized.html')
     if incident_status not in ['Active', 'active', 'Acknowledged', 'acknowledged', 'Cleared', 'cleared']:
         raise Http404("No such incident")
     query_params = dict()
@@ -103,13 +103,13 @@ def view_all_incidents(request, team_id=None, incident_status='active'):
     if settings.JIRA_ENABLED:
         render_vars['jira_enabled'] = True
         render_vars['jira_url'] = '%s/browse/' % settings.JIRA_OPTS['URL']
-    return render_to_response('view_all_incidents.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'view_all_incidents.html', render_vars)
 
 
 @login_required(login_url='/login/')
 def view_single_incident(request, incident_id):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     incident = get_object_or_404(Incident, pk=incident_id)
     if settings.JIRA_ENABLED:
         jira_enabled = True
@@ -123,13 +123,13 @@ def view_single_incident(request, incident_id):
     comments = Comments.objects.filter(incident=incident).order_by('date_added')
     comments_form = CommentsForm()
     redirect_to = '/incidents/view/%s/' % incident.id
-    return render_to_response('view_incident.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'view_incident.html', locals())
 
 
 @login_required(login_url='/login/')
 def toggle_incident_status(request):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == "POST":
         form = incidents.IncidentToggleForm(request.POST)
         if form.is_valid():
@@ -142,8 +142,7 @@ def toggle_incident_status(request):
                 request.user.team_set.get(pk=incident.event.team.id)
             except Team.DoesNotExist:
                 error_msg = "You cannot perform this action because you do not belong to this team."
-                return render_to_response('unauthorized.html', {'error_msg': error_msg},
-                                          context_instance=RequestContext(request))
+                return render(request, 'unauthorized.html', {'error_msg': error_msg})
             now = timezone.make_aware(datetime.utcnow(), timezone.get_current_timezone())
             incident.toggle_status(form_incident_status, request.user, now)
             incident.save()
@@ -160,7 +159,7 @@ def toggle_incident_status(request):
 def view_element(request):
     render_vars = dict()
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == "POST":
         form = incidents.ElementSearchForm(request.POST)
         if form.is_valid():
@@ -171,7 +170,7 @@ def view_element(request):
     else:
         form = incidents.ElementSearchForm()
     render_vars['search_form'] = form
-    return render_to_response('view_elements.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'view_elements.html', render_vars)
 
 
 class BulkToggleIncidents(LoginRequiredMixin, FormView):
