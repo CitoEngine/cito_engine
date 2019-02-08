@@ -39,7 +39,7 @@ def login_user(request):
     state = ''
     username = ''
     password = ''
-    redirect_to = request.REQUEST.get('next')
+    redirect_to = request.GET.get('next')
     ip = get_ip(request)
     if request.POST:
         username = request.POST.get('username')
