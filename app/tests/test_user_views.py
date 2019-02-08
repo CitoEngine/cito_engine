@@ -68,7 +68,18 @@ class TestUserViews(TransactionTestCase):
         self.assertNotIn(t1, self.user.team_set.filter(id=t1.id))
 
     def test_user_edit_view(self):
-        """Testing edit user view"""
+        """Testing edit user view without"""
+        self.login()
+        data = dict(first_name='Burt',
+                    last_name='Reynolds',
+                    email='b@b.com',
+                    username='burty',
+                    )
+        response = self.client.post('/users/edit/%d/' % self.user.id, data=data, follow=True)
+        self.assertRedirects(response, '/users/view/%d/' % self.user.id)
+
+    def test_user_edit_view_with_password_change(self):
+        """Testing edit user view  with password change"""
         self.login()
         data = dict(first_name='Burt',
                     last_name='Reynolds',
@@ -77,7 +88,7 @@ class TestUserViews(TransactionTestCase):
                     password1='pass1',
                     password2='pass1')
         response = self.client.post('/users/edit/%d/' % self.user.id, data=data, follow=True)
-        self.assertRedirects(response, '/users/view/%d/' % self.user.id)
+        self.assertRedirects(response, '/login/?next=/users/view/%s/' % self.user.id)
 
     def test_user_toggle(self):
         """Test user_toggle view i.e setting is_active True/False"""
