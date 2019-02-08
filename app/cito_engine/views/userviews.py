@@ -46,7 +46,7 @@ def view_single_user(request, user_id):
         allteams = Team.objects.all()
     except Team.DoesNotExist:
         allteams = None
-    return render('view_user.html', {'view_user': view_user, 'allteams': allteams, 'form': permform, 'status_text': status_text})
+    return render(request, 'view_user.html', {'view_user': view_user, 'allteams': allteams, 'form': permform, 'status_text': status_text})
 
 
 @login_required(login_url='/login/')
