@@ -7,7 +7,7 @@ env:
   - BOTO_CONFIG=/dev/null
 install: 
     - cd app/
-    - "cp settings/citoengine.conf-example settings/citoengine.conf"
+    - "cp settings/citoengine.conf-dev settings/citoengine.conf"
     - "pip install -r ../requirements-dev.txt"
     - "pip install coveralls"
 before_script: 
