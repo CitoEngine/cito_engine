@@ -15,7 +15,7 @@ limitations under the License.
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from cito_engine.forms import events
 from cito_engine.models import Event, Team, EventAction
@@ -25,7 +25,7 @@ from cito_engine.actions import export_utils
 @login_required(login_url='/login/')
 def add_event(request):
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Define new event'
     box_title = page_title
 
@@ -36,14 +36,14 @@ def add_event(request):
             return redirect('/events/view/%s' % form_model.id)
     else:
         form = events.EventForm()
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 
 @login_required(login_url='/login/')
 def view_events(request):
     render_vars = dict()
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     render_vars['search_form'] = events.EventSearchForm()
     render_vars['page_title'] = "View Events"
 
@@ -83,13 +83,13 @@ def view_events(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             render_vars['events'] = paginator.page(paginator.num_pages)
-    return render_to_response('view_all_events.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'view_all_events.html', render_vars)
 
 
 @login_required(login_url='/login/')
 def view_single_event(request, event_id):
     if request.user.perms.access_level > 4:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     event = get_object_or_404(Event, pk=event_id)
     if request.method == 'POST':
         event_action_id = request.POST.get('event_action_id')
@@ -101,13 +101,13 @@ def view_single_event(request, event_id):
         eventActions = EventAction.objects.filter(event=event)
     except EventAction.DoesNotExist:
         eventActions = None
-    return render_to_response('view_event.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'view_event.html', locals())
 
 
 @login_required(login_url='/login/')
 def edit_event(request, event_id):
     if request.user.perms.access_level > 3:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     page_title = 'Editing Event'
     box_title = 'Editing Event'
     event = get_object_or_404(Event,pk=event_id)
@@ -124,7 +124,7 @@ def edit_event(request, event_id):
             return redirect('/events/view/%s' % event_id)
     else:
         form = events.EventForm(instance=event)
-    return render_to_response('generic_form.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', locals())
 
 
 

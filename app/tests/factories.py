@@ -17,32 +17,40 @@ import factory
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+import cito_engine.models
+import rules_engine.models
+
 
 class PluginServerFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.PluginServer'
+    class Meta:
+        model = cito_engine.models.PluginServer
     name = 'Factory Plugin Server'
     url = 'http://factory_plugin_server'
 
 
 class PluginFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.Plugin'
+    class Meta:
+        model = cito_engine.models.Plugin
     server = factory.LazyAttribute(lambda n: PluginServerFactory())
     name = 'Factory Plugin'
 
 
 class TeamFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.Team'
+    class Meta:
+        model = cito_engine.models.Team
     name = 'The_A_Team'
     description = factory.Sequence(lambda n: 'Team #{0}'.format(n))
 
 
 class CategoryFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.Category'
+    class Meta:
+        model = cito_engine.models.Category
     categoryType = 'CPU'
 
 
 class EventFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.Event'
+    class Meta:
+        model = cito_engine.models.Event
     summary = factory.Sequence(lambda n: 'Event #{0}'.format(n))
     description = 'A factory made event!'
     team = factory.LazyAttribute(lambda n: TeamFactory())
@@ -50,20 +58,23 @@ class EventFactory(factory.DjangoModelFactory):
 
 
 class IncidentFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.Incident'
+    class Meta:
+        model = cito_engine.models.Incident
     event = factory.LazyAttribute(lambda n: EventFactory())
     lastEventTime = timezone.now()
     element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
 
 
 class IncidentLogFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.IncidentLog'
+    class Meta:
+        model = cito_engine.models.IncidentLog
     incident = factory.LazyAttribute(lambda n: IncidentFactory())
     msg = factory.Sequence(lambda n: 'msg{0}'.format(n))
 
 
 class EventActionFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.EventAction'
+    class Meta:
+        model = cito_engine.models.EventAction
     event = factory.LazyAttribute(lambda n: EventFactory())
     plugin = factory.LazyAttribute(lambda n: PluginFactory())
     pluginParameters = '[ "__EVENTID__","__MESSAGE__","__INCIDENTID__"]'
@@ -72,20 +83,23 @@ class EventActionFactory(factory.DjangoModelFactory):
 
 
 class EventActionCounterFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.EventActionCounter'
+    class Meta:
+        model = cito_engine.models.EventActionCounter
     incident = factory.LazyAttribute(lambda n: IncidentFactory())
     event_action = factory.LazyAttribute(lambda n: EventActionFactory())
 
 
 class EventActionLogFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'cito_engine.EventActionLog'
+    class Meta:
+        model = cito_engine.models.EventActionLog
     incident = factory.LazyAttribute(lambda n: IncidentFactory())
     event_action = factory.LazyAttribute(lambda n: EventActionFactory())
     text = factory.Sequence(lambda n: 'factory made event_action_log {0}'.format(n))
 
 
 class UserFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = User
+    class Meta:
+        model = User
     first_name = factory.Sequence(lambda n: "First%s" % n)
     last_name = factory.Sequence(lambda n: "Last%s" % n)
     email = factory.Sequence(lambda n: "email%s@example.com" % n)
@@ -95,20 +109,22 @@ class UserFactory(factory.DjangoModelFactory):
 
 
 class EventSuppressorFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'rules_engine.EventSuppressor'
+    class Meta:
+        model = rules_engine.models.EventSuppressor
     event = factory.LazyAttribute(lambda n: EventFactory())
     suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
 
 
 class ElementSuppressorFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'rules_engine.ElementSuppressor'
+    class Meta:
+        model = rules_engine.models.ElementSuppressor
     element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
     suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
 
 
 class EventAndElementSuppressorFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = 'rules_engine.EventAndElementSuppressor'
+    class Meta:
+        model = rules_engine.models.EventAndElementSuppressor
     event = factory.LazyAttribute(lambda n: EventFactory())
     element = factory.Sequence(lambda n: 'host{0}.citoenginetests.com'.format(n))
     suppressed_by = factory.LazyAttribute(lambda n: UserFactory())
-

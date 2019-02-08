@@ -14,15 +14,16 @@ limitations under the License.
 """
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from .forms import CommentsForm
+
 
 @login_required(login_url='/login/')
 def add_comment(request):
     if request.method == 'POST':
         if request.user.perms.access_level > 4:
-            return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+            return render(request, 'unauthorized.html')
 
         form = CommentsForm(request.POST, user=request.user)
         if form.is_valid():

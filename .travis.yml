@@ -3,9 +3,11 @@ python:
   - "2.7"
 env:
   - DJANGO_SETTINGS_MODULE=settings.dev
-# command to install dependencies
+# following is workaround to travis build system bug. See https://github.com/travis-ci/travis-ci/issues/7940
+  - BOTO_CONFIG=/dev/null
 install: 
     - cd app/
+    - "cp settings/citoengine.conf-dev settings/citoengine.conf"
     - "pip install -r ../requirements-dev.txt"
     - "pip install coveralls"
 before_script: 

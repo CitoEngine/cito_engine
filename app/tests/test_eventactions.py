@@ -15,13 +15,14 @@ limitations under the License.
 
 from time import time
 from mock import patch, call
-from django.test import TestCase
+from django.test import TransactionTestCase
 from cito_engine.models import Incident, IncidentLog, EventActionCounter
 from cito_engine.poller.event_poller import EventPoller
 from . import factories
 
-
-class TestEventActions(TestCase):
+# Read this for more information on why we use TransactionTestCase
+# https://stackoverflow.com/questions/21458387/transactionmanagementerror-you-cant-execute-queries-until-the-end-of-the-atom
+class TestEventActions(TransactionTestCase):
     """
     X = 2, Y=100
 
@@ -41,7 +42,7 @@ class TestEventActions(TestCase):
 
     @patch('cito_engine.actions.incidents.requests')
     def test__single_event_action_execution(self, mock_requests):
-        self.eventaction = factories.EventActionFactory.create(event=self.event,threshold_count=2, threshold_timer=100)
+        self.eventaction = factories.EventActionFactory.create(event=self.event, threshold_count=2, threshold_timer=100)
         T = int(time())
         raw_incident = '{ "event": {"eventid":"%s", "element":"foo", "message":"omgwtfbbq"}, "timestamp": %d}' % (self.event.id, T)
 

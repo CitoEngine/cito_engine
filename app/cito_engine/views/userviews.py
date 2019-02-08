@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django import forms
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponseBadRequest
 from django.template import RequestContext
 from cito_engine.models import Team
@@ -28,9 +28,7 @@ from appauth.models import Perms
 @login_required(login_url='/login/')
 def view_all_users(request):
     users = User.objects.all()
-    return render_to_response('view_all_users.html',
-                              {'users': users},
-                              context_instance=RequestContext(request))
+    return render(request=request, template_name='view_all_users.html', context={'users': users})
 
 
 @login_required(login_url='/login/')
@@ -48,15 +46,13 @@ def view_single_user(request, user_id):
         allteams = Team.objects.all()
     except Team.DoesNotExist:
         allteams = None
-    return render_to_response('view_user.html',
-                              {'view_user': view_user, 'allteams': allteams, 'form': permform, 'status_text': status_text},
-                              context_instance=RequestContext(request))
+    return render(request, 'view_user.html', {'view_user': view_user, 'allteams': allteams, 'form': permform, 'status_text': status_text})
 
 
 @login_required(login_url='/login/')
 def modify_user_team_membership(request, toggle):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == 'POST' and toggle in ['add', 'remove']:
         user_id = request.POST.get('user_id')
         team_id = request.POST.get('team_id')
@@ -74,7 +70,7 @@ def modify_user_team_membership(request, toggle):
 @login_required(login_url='/login/')
 def update_user_perms(request):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
         user = get_object_or_404(User, pk=user_id)
@@ -98,7 +94,7 @@ def update_user_perms(request):
 @login_required(login_url='/login/')
 def create_user(request):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     render_vars = dict()
     form = user_form.UserCreationForm()
     if request.method == "POST":
@@ -119,7 +115,7 @@ def create_user(request):
             Perms.objects.create(user=user, access_level=access_level).save()
             return redirect('/users/')
     render_vars['form'] = form
-    return render_to_response('generic_form.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', render_vars)
 
 
 @login_required(login_url='/login/')
@@ -127,7 +123,7 @@ def edit_user(request, user_id):
     render_vars = dict()
     user = get_object_or_404(User, pk=user_id)
     if request.user.perms.access_level > 2 and request.user != user:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == "POST":
         form = user_form.EditUserForm(request.POST)
         if form.is_valid():
@@ -149,13 +145,13 @@ def edit_user(request, user_id):
         form = user_form.EditUserForm(initial=form_vars)
     render_vars['form'] = form
     render_vars['page_title'] = render_vars['box_title'] = 'Editing user: %s ' % user.username
-    return render_to_response('generic_form.html', render_vars, context_instance=RequestContext(request))
+    return render(request, 'generic_form.html', render_vars)
 
 
 @login_required(login_url='/login/')
 def toggle_user(request):
     if request.user.perms.access_level > 2:
-        return render_to_response('unauthorized.html', context_instance=RequestContext(request))
+        return render(request, 'unauthorized.html')
     if request.method == 'POST':
         try:
             user_id = int(request.POST.get('user_id'))
