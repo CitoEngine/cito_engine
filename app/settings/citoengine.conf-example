@@ -43,10 +43,10 @@ ALLOWED_HOSTS = *
 #####################################################################
 [DATABASE]
 ENGINE = mysql
-DBNAME =
-DBUSER =
-DBPASSWORD =
-DBHOST = localhost
+DBNAME = citoengine
+DBUSER = root
+DBPASSWORD = password
+DBHOST = 127.0.0.1
 DBPORT = 3306
 
 #####################################################################

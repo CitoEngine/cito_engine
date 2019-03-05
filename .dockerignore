@@ -1,0 +1,8 @@
+LICENSE
+README.md  
+app/*  
+bin/*  
+requirements-dev.txt  
+requirements.txt  
+setup.cfg  
+setup.py
